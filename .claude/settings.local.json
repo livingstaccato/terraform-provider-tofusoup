@@ -22,7 +22,8 @@
       "Bash(export FLAVOR_LOG_LEVEL=debug TF_PLUGIN_MAGIC_COOKIE=\"d602bf8f470bc67ca7faa0386276bbdd4330efaf76d1a219cb4e95f7aa66ead0\":*)",
       "Bash(uv pip install:*)",
       "Bash(pyvider components list:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(pyvider components diagnostics:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
