@@ -7,7 +7,8 @@
       "Bash(ruff check:*)",
       "Bash(mypy:*)",
       "Bash(pytest:*)",
-      "Bash(pip install:*)"
+      "Bash(pip install:*)",
+      "Bash(test:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
