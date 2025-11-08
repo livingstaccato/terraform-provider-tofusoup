@@ -16,7 +16,8 @@
       "Bash(export TF_PLUGIN_MAGIC_COOKIE=\"d602bf8f470bc67ca7faa0386276bbdd4330efaf76d1a219cb4e95f7aa66ead0\":*)",
       "Bash(~/.terraform.d/plugins/local/providers/tofusoup/0.0.0/darwin_arm64/terraform-provider-tofusoup launch-context)",
       "Bash(python:*)",
-      "Bash(readlink:*)"
+      "Bash(readlink:*)",
+      "Bash(make build:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
