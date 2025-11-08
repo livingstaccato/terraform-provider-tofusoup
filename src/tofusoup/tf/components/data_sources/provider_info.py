@@ -148,6 +148,12 @@ class ProviderInfoDataSource(BaseDataSource[str, ProviderInfoState, ProviderInfo
                         name=config.name,
                     )
 
+            # Check if provider was found (empty dict means error occurred)
+            if not details:
+                raise DataSourceError(
+                    f"Provider {config.namespace}/{config.name} not found in {config.registry} registry"
+                )
+
             # Extract relevant information from the registry response
             return ProviderInfoState(
                 namespace=config.namespace,

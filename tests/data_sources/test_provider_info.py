@@ -35,14 +35,15 @@ class TestProviderInfoDataSource:
         """Test that get_schema returns a valid PvsSchema."""
         schema = ProviderInfoDataSource.get_schema()
         assert isinstance(schema, PvsSchema)
-        assert "namespace" in schema.attributes
-        assert "name" in schema.attributes
-        assert "registry" in schema.attributes
-        assert "latest_version" in schema.attributes
-        assert "description" in schema.attributes
-        assert "source_url" in schema.attributes
-        assert "downloads" in schema.attributes
-        assert "published_at" in schema.attributes
+        # Schema has a block attribute which contains the attributes
+        assert "namespace" in schema.block.attributes
+        assert "name" in schema.block.attributes
+        assert "registry" in schema.block.attributes
+        assert "latest_version" in schema.block.attributes
+        assert "description" in schema.block.attributes
+        assert "source_url" in schema.block.attributes
+        assert "downloads" in schema.block.attributes
+        assert "published_at" in schema.block.attributes
 
     def test_config_class_is_frozen(self) -> None:
         """Test that ProviderInfoConfig is immutable (frozen)."""
@@ -290,7 +291,7 @@ class TestProviderInfoErrorHandling:
     @pytest.mark.asyncio
     async def test_read_handles_provider_not_found(self, httpx_mock: HTTPXMock) -> None:
         """Test that read handles 404 provider not found error."""
-        # Mock a 404 response
+        # Mock a 404 response - registry returns empty dict for 404s
         httpx_mock.add_response(url="https://registry.terraform.io/v1/providers/nonexistent/provider", status_code=404)
 
         ds = ProviderInfoDataSource()
@@ -300,14 +301,14 @@ class TestProviderInfoErrorHandling:
         # Should raise DataSourceError with helpful message
         with pytest.raises(
             DataSourceError,
-            match="Failed to query provider info for nonexistent/provider from terraform registry",
+            match="Provider nonexistent/provider not found in terraform registry",
         ):
             await ds.read(ctx)
 
     @pytest.mark.asyncio
     async def test_read_handles_http_error(self, httpx_mock: HTTPXMock) -> None:
         """Test that read handles HTTP errors (5xx)."""
-        # Mock a 500 server error
+        # Mock a 500 server error - registry returns empty dict for HTTP errors
         httpx_mock.add_response(url="https://registry.terraform.io/v1/providers/hashicorp/aws", status_code=500)
 
         ds = ProviderInfoDataSource()
@@ -315,13 +316,13 @@ class TestProviderInfoErrorHandling:
         ctx = ResourceContext(config=config)
 
         # Should raise DataSourceError
-        with pytest.raises(DataSourceError, match="Failed to query provider info"):
+        with pytest.raises(DataSourceError, match="Provider hashicorp/aws not found in terraform registry"):
             await ds.read(ctx)
 
     @pytest.mark.asyncio
     async def test_read_handles_network_error(self, httpx_mock: HTTPXMock) -> None:
         """Test that read handles network errors."""
-        # Mock a connection error
+        # Mock a connection error - registry returns empty dict for network errors
         import httpx
 
         httpx_mock.add_exception(httpx.ConnectError("Connection failed"))
@@ -330,13 +331,14 @@ class TestProviderInfoErrorHandling:
         config = ProviderInfoConfig(namespace="hashicorp", name="aws", registry="terraform")
         ctx = ResourceContext(config=config)
 
-        # Should raise DataSourceError wrapping the network error
-        with pytest.raises(DataSourceError, match="Failed to query provider info"):
+        # Should raise DataSourceError
+        with pytest.raises(DataSourceError, match="Provider hashicorp/aws not found in terraform registry"):
             await ds.read(ctx)
 
     @pytest.mark.asyncio
     async def test_read_wraps_exception_with_context(self, httpx_mock: HTTPXMock) -> None:
         """Test that exceptions are wrapped with helpful context."""
+        # Mock a 403 error - registry returns empty dict
         httpx_mock.add_response(url="https://registry.terraform.io/v1/providers/hashicorp/aws", status_code=403)
 
         ds = ProviderInfoDataSource()
@@ -350,6 +352,7 @@ class TestProviderInfoErrorHandling:
         error_message = str(exc_info.value)
         assert "hashicorp/aws" in error_message
         assert "terraform" in error_message
+        assert "not found" in error_message
 
 
 class TestProviderInfoEdgeCases:
