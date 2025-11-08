@@ -8,7 +8,8 @@
       "Bash(mypy:*)",
       "Bash(pytest:*)",
       "Bash(pip install:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(find:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
