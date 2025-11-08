@@ -16,6 +16,9 @@ dependencies = [
 [project.scripts]
 terraform-provider-tofusoup = "pyvider.cli:main"
 
+[project.entry-points.pyvider]
+terraform-provider-tofusoup = "tofusoup.tf.components"
+
 [dependency-groups]
 dev = [
     "provide-testkit[all]",
