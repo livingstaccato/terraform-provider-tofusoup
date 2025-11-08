@@ -13,6 +13,9 @@ dependencies = [
     "provide-foundation[all]",
 ]
 
+[project.scripts]
+terraform-provider-tofusoup = "pyvider.cli:main"
+
 [dependency-groups]
 dev = [
     "provide-testkit[all]",
