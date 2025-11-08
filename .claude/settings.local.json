@@ -19,7 +19,9 @@
       "Bash(readlink:*)",
       "Bash(make build:*)",
       "Bash(/Users/tim/code/gh/provide-io/terraform-provider-tofusoup/dist/terraform-provider-tofusoup.psp launch-context:*)",
-      "Bash(export FLAVOR_LOG_LEVEL=debug TF_PLUGIN_MAGIC_COOKIE=\"d602bf8f470bc67ca7faa0386276bbdd4330efaf76d1a219cb4e95f7aa66ead0\":*)"
+      "Bash(export FLAVOR_LOG_LEVEL=debug TF_PLUGIN_MAGIC_COOKIE=\"d602bf8f470bc67ca7faa0386276bbdd4330efaf76d1a219cb4e95f7aa66ead0\":*)",
+      "Bash(uv pip install:*)",
+      "Bash(pyvider components list:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
