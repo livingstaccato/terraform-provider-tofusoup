@@ -10,7 +10,8 @@
       "Bash(pip install:*)"
     ],
     "additionalDirectories": [
-      "/Users/tim/code/gh/provide-io"
+      "/Users/tim/code/gh/provide-io",
+      "/Users/tim/.terraform.d"
     ]
   }
 }
