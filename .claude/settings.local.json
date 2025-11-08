@@ -17,7 +17,8 @@
       "Bash(~/.terraform.d/plugins/local/providers/tofusoup/0.0.0/darwin_arm64/terraform-provider-tofusoup launch-context)",
       "Bash(python:*)",
       "Bash(readlink:*)",
-      "Bash(make build:*)"
+      "Bash(make build:*)",
+      "Bash(/Users/tim/code/gh/provide-io/terraform-provider-tofusoup/dist/terraform-provider-tofusoup.psp launch-context:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
