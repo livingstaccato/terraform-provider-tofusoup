@@ -5,10 +5,12 @@
 
 """Shared test fixtures for data source tests."""
 
+from typing import Any
+
 import pytest
 from pyvider.resources.context import ResourceContext  # type: ignore
 
-from tofusoup.tf.components.data_sources.provider_info import ProviderInfoConfig
+from tofusoup.tf.components.data_sources.provider_info import ProviderInfoConfig  # type: ignore
 
 
 @pytest.fixture
@@ -18,7 +20,7 @@ def sample_config() -> ProviderInfoConfig:
 
 
 @pytest.fixture
-def sample_terraform_response() -> dict:
+def sample_terraform_response() -> dict[str, Any]:
     """Sample Terraform registry API response."""
     return {
         "namespace": "hashicorp",
@@ -32,7 +34,7 @@ def sample_terraform_response() -> dict:
 
 
 @pytest.fixture
-def sample_opentofu_response() -> dict:
+def sample_opentofu_response() -> dict[str, Any]:
     """Sample OpenTofu registry API response."""
     return {
         "namespace": "hashicorp",

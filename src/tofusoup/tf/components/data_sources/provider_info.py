@@ -73,6 +73,9 @@ class ProviderInfoDataSource(BaseDataSource[str, ProviderInfoState, ProviderInfo
 
     ## Attribute Reference
 
+    - `namespace` - The provider namespace (echoes input)
+    - `name` - The provider name (echoes input)
+    - `registry` - The registry queried (echoes input)
     - `latest_version` - Latest version string of the provider
     - `description` - Provider description from the registry
     - `source_url` - Source code repository URL
