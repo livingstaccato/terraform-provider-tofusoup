@@ -23,7 +23,8 @@
       "Bash(uv pip install:*)",
       "Bash(pyvider components list:*)",
       "Bash(done)",
-      "Bash(pyvider components diagnostics:*)"
+      "Bash(pyvider components diagnostics:*)",
+      "Bash(uv pip list:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
