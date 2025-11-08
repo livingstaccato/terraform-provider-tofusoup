@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(tree:*)",
-      "Bash(ruff format:*)"
+      "Bash(ruff format:*)",
+      "Bash(source .venv/bin/activate)",
+      "Bash(ruff check:*)",
+      "Bash(mypy:*)",
+      "Bash(pytest:*)",
+      "Bash(pip install:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io"

@@ -1,6 +1,6 @@
 [project]
 name = "terraform-provider-tofusoup"
-version = "0.1.0"
+version = "0.0.1108"
 description = "Terraform provider for TofuSoup registry queries and state inspection"
 requires-python = ">=3.11"
 readme = "README.md"
@@ -22,8 +22,12 @@ docs = [
     "provide-testkit[docs]",
 ]
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/soup"]
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.ruff]
 line-length = 120
