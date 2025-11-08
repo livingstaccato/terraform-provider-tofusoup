@@ -1,3 +1,5 @@
 """TofuSoup Terraform provider data sources."""
 
-__all__ = []
+from tofusoup.tf.components.data_sources import provider_info
+
+__all__ = ["provider_info"]
