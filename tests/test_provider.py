@@ -45,9 +45,15 @@ def test_provider_schema() -> None:
     """Test that the provider schema is correctly defined."""
     schema = TofuSoupProvider.get_schema()
     assert schema is not None
-    # Verify schema is a valid PvsSchema object
-    assert hasattr(schema, "type")
-    assert schema.type == "provider"
+    # Verify schema is a valid PvsSchema object with provider configuration
+    assert hasattr(schema, "block")
+    assert schema.block is not None
+    assert hasattr(schema.block, "attributes")
+    assert "cache_dir" in schema.block.attributes
+    assert "cache_ttl_hours" in schema.block.attributes
+    assert "terraform_registry_url" in schema.block.attributes
+    assert "opentofu_registry_url" in schema.block.attributes
+    assert "log_level" in schema.block.attributes
 
 
 def test_provider_config_immutable() -> None:

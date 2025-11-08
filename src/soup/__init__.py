@@ -1,1 +1,0 @@
-"""TofuSoup namespace package."""
