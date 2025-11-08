@@ -24,7 +24,8 @@
       "Bash(pyvider components list:*)",
       "Bash(done)",
       "Bash(pyvider components diagnostics:*)",
-      "Bash(uv pip list:*)"
+      "Bash(uv pip list:*)",
+      "Bash(plating plate)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
