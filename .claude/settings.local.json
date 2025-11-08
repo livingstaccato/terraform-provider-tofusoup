@@ -10,7 +10,8 @@
       "Bash(pip install:*)",
       "Bash(test:*)",
       "Bash(find:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(pyvider install:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
