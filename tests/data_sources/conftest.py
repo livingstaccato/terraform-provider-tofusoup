@@ -11,7 +11,7 @@ from typing import Any
 import pytest
 from pyvider.resources.context import ResourceContext  # type: ignore
 from tofusoup.registry.models.module import Module, ModuleVersion  # type: ignore
-from tofusoup.registry.models.provider import ProviderPlatform, ProviderVersion  # type: ignore
+from tofusoup.registry.models.provider import Provider, ProviderPlatform, ProviderVersion  # type: ignore
 
 from tofusoup.tf.components.data_sources.provider_info import ProviderInfoConfig  # type: ignore
 
@@ -172,6 +172,35 @@ def sample_module_search_results() -> list[Module]:
             source_url="https://github.com/terraform-aws-modules/terraform-aws-rds",
             downloads=23456789,
             verified=False,
+            versions=[],
+            latest_version=None,
+            registry_source=None,
+        ),
+    ]
+
+
+@pytest.fixture
+def sample_provider_search_results() -> list[Provider]:
+    """Sample provider search results list."""
+    return [
+        Provider(
+            id="hashicorp/aws",
+            namespace="hashicorp",
+            name="aws",
+            description="Terraform AWS provider",
+            source_url="https://github.com/hashicorp/terraform-provider-aws",
+            tier="official",
+            versions=[],
+            latest_version=None,
+            registry_source=None,
+        ),
+        Provider(
+            id="hashicorp/google",
+            namespace="hashicorp",
+            name="google",
+            description="Terraform Google Cloud Platform provider",
+            source_url="https://github.com/hashicorp/terraform-provider-google",
+            tier="official",
             versions=[],
             latest_version=None,
             registry_source=None,
