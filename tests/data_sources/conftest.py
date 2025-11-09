@@ -208,4 +208,120 @@ def sample_provider_search_results() -> list[Provider]:
     ]
 
 
+@pytest.fixture
+def sample_empty_state(tmp_path):
+    """Create an empty state file."""
+    import json
+
+    state_file = tmp_path / "terraform.tfstate"
+    state_file.write_text(
+        json.dumps(
+            {
+                "version": 4,
+                "terraform_version": "1.10.6",
+                "serial": 1,
+                "lineage": "test-lineage-empty",
+                "outputs": {},
+                "resources": [],
+                "check_results": None,
+            }
+        )
+    )
+    return state_file
+
+
+@pytest.fixture
+def sample_state_with_resources(tmp_path):
+    """Create state file with managed and data resources."""
+    import json
+
+    state_file = tmp_path / "terraform.tfstate"
+    state_file.write_text(
+        json.dumps(
+            {
+                "version": 4,
+                "terraform_version": "1.10.2",
+                "serial": 3,
+                "lineage": "test-lineage-resources",
+                "outputs": {
+                    "example_output": {"value": "example_value", "type": "string"},
+                    "another_output": {"value": 42, "type": "number"},
+                },
+                "resources": [
+                    {
+                        "mode": "data",
+                        "type": "aws_ami",
+                        "name": "ubuntu",
+                        "provider": 'provider["registry.terraform.io/hashicorp/aws"]',
+                        "instances": [{"attributes": {}}],
+                    },
+                    {
+                        "mode": "managed",
+                        "type": "aws_instance",
+                        "name": "example",
+                        "provider": 'provider["registry.terraform.io/hashicorp/aws"]',
+                        "instances": [{"attributes": {}}],
+                    },
+                    {
+                        "mode": "managed",
+                        "type": "aws_s3_bucket",
+                        "name": "storage",
+                        "provider": 'provider["registry.terraform.io/hashicorp/aws"]',
+                        "instances": [{"attributes": {}}],
+                    },
+                ],
+                "check_results": None,
+            }
+        )
+    )
+    return state_file
+
+
+@pytest.fixture
+def sample_state_with_modules(tmp_path):
+    """Create state file with module resources."""
+    import json
+
+    state_file = tmp_path / "terraform.tfstate"
+    state_file.write_text(
+        json.dumps(
+            {
+                "version": 4,
+                "terraform_version": "1.10.0",
+                "serial": 5,
+                "lineage": "test-lineage-modules",
+                "outputs": {},
+                "resources": [
+                    {
+                        "mode": "managed",
+                        "type": "aws_instance",
+                        "name": "web",
+                        "module": "module.ec2_cluster",
+                        "provider": 'provider["registry.terraform.io/hashicorp/aws"]',
+                        "instances": [{"attributes": {}}],
+                    },
+                    {
+                        "mode": "managed",
+                        "type": "aws_instance",
+                        "name": "db",
+                        "module": "module.database",
+                        "provider": 'provider["registry.terraform.io/hashicorp/aws"]',
+                        "instances": [{"attributes": {}}],
+                    },
+                    {
+                        "mode": "data",
+                        "type": "aws_vpc",
+                        "name": "main",
+                        "module": "module.ec2_cluster",
+                        "provider": 'provider["registry.terraform.io/hashicorp/aws"]',
+                        "instances": [{"attributes": {}}],
+                    },
+                ],
+                "check_results": None,
+            }
+        )
+    )
+    return state_file
+
+
 # 🐍🧪🔚

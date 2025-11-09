@@ -7,6 +7,7 @@ from tofusoup.tf.components.data_sources import (
     provider_info,
     provider_versions,
     registry_search,
+    state_info,
 )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "provider_info",
     "provider_versions",
     "registry_search",
+    "state_info",
 ]
