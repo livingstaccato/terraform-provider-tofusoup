@@ -139,7 +139,7 @@ class TestStateInfoRead:
         assert state.serial == 3
         assert state.lineage == "test-lineage-resources"
         assert state.resources_count == 3
-        assert state.outputs_count == 2
+        assert state.outputs_count == 3
         assert state.managed_resources_count == 2
         assert state.data_resources_count == 1
         assert state.modules_count == 0  # No modules in this state
@@ -226,7 +226,7 @@ class TestStateInfoRead:
 
         state = await ds.read(ctx)
 
-        assert state.outputs_count == 2
+        assert state.outputs_count == 3
 
     @pytest.mark.asyncio
     async def test_read_with_relative_path(self, sample_empty_state, monkeypatch):
