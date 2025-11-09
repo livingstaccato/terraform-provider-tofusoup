@@ -37,7 +37,10 @@
       "Bash(HANDOFF-PARTS-01-12.md)",
       "Bash(HANDOFF-PART-06.md)",
       "Bash(HANDOFF-PART-07.md)",
-      "Bash(HANDOFF-PART-08.md)"
+      "Bash(HANDOFF-PART-08.md)",
+      "Bash(terraform show:*)",
+      "Bash(terraform output:*)",
+      "Bash(/dev/null)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
