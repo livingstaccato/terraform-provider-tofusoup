@@ -31,3 +31,6 @@ output "file_metadata" {
     modified   = data.tofusoup_state_info.current.state_file_modified
   }
 }
+output "all" {
+  value = data.tofusoup_state_info.current
+}
