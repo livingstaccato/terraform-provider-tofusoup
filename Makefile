@@ -1,4 +1,20 @@
-.PHONY: help venv deps build install test plating docs-setup docs-build docs docs-serve clean keys
+# Terraform Provider TofuSoup - Makefile
+#
+# NOTE: This Makefile follows terraform-provider-pyvider as the reference implementation.
+# TODO: Establish formal Makefile template system in provide-foundry for consistency across all provider projects.
+
+.PHONY: help
+help: ## Show this help message
+	@echo "Terraform Provider TofuSoup - Development Commands"
+	@echo "=================================================="
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+	@echo ""
+	@echo "Quick Start:"
+	@echo "  make dev            # Quick development setup and build"
+	@echo "  make build          # Build the provider"
+	@echo "  make test           # Run tests"
+	@echo "  make docs           # Build documentation"
 
 # Configuration
 PROVIDER_NAME := terraform-provider-tofusoup
@@ -6,85 +22,96 @@ VERSION ?= 0.0.1108
 SHELL := /bin/bash
 
 # Platform detection
-UNAME_S := $(shell uname -s)
+UNAME_S := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 UNAME_M := $(shell uname -m)
 
-ifeq ($(UNAME_S),Darwin)
-	ifeq ($(UNAME_M),arm64)
-		PLATFORM := darwin_arm64
-	else
-		PLATFORM := darwin_amd64
-	endif
-else ifeq ($(UNAME_S),Linux)
-	ifeq ($(UNAME_M),aarch64)
-		PLATFORM := linux_arm64
-	else
-		PLATFORM := linux_amd64
-	endif
+# Convert uname -m output to Go arch naming
+ifeq ($(UNAME_M),x86_64)
+    ARCH := amd64
+else ifeq ($(UNAME_M),arm64)
+    ARCH := arm64
+else ifeq ($(UNAME_M),aarch64)
+    ARCH := arm64
 else
-	PLATFORM := windows_amd64
+    ARCH := $(UNAME_M)
 endif
+CURRENT_PLATFORM := $(UNAME_S)_$(ARCH)
 
 # Paths
 VENV := .venv
-INSTALL_DIR := $(HOME)/.terraform.d/plugins/local/providers/tofusoup/$(VERSION)/$(PLATFORM)
+INSTALL_DIR := $(HOME)/.terraform.d/plugins/local/providers/tofusoup/$(VERSION)/$(CURRENT_PLATFORM)
 PSP_FILE := dist/$(PROVIDER_NAME).psp
 VERSIONED_BINARY := $(INSTALL_DIR)/$(PROVIDER_NAME)
 
-help:
-	@echo "Available targets:"
-	@echo "  venv        - Create virtual environment"
-	@echo "  deps        - Install dependencies with uv"
-	@echo "  keys        - Generate signing keys for FlavorPack"
-	@echo "  build       - Build provider binary with FlavorPack"
-	@echo "  install     - Install provider to local Terraform plugins directory"
-	@echo "  test        - Run tests"
-	@echo "  plating     - Generate documentation with Plating"
-	@echo "  docs-setup  - Extract theme assets from provide-foundry"
-	@echo "  docs-build  - Build documentation (setup + plating + mkdocs)"
-	@echo "  docs        - Build documentation"
-	@echo "  docs-serve  - Serve documentation locally"
-	@echo "  clean       - Clean build artifacts"
-	@echo ""
-	@echo "Platform: $(PLATFORM)"
-	@echo "Install directory: $(INSTALL_DIR)"
+# Colors for output
+BLUE := \033[0;34m
+GREEN := \033[0;32m
+YELLOW := \033[0;33m
+RED := \033[0;31m
+NC := \033[0m # No Color
 
-venv:
+# ==============================================================================
+# 🚀 Quick Commands
+# ==============================================================================
+
+.PHONY: all
+all: clean venv deps docs build test ## Run full development cycle
+
+.PHONY: dev
+dev: venv deps build install ## Quick development setup and build
+
+# ==============================================================================
+# 🔧 Setup & Environment
+# ==============================================================================
+
+.PHONY: venv
+venv: ## Create virtual environment
 	@if [ ! -d "$(VENV)" ]; then \
-		echo "Creating virtual environment..."; \
+		echo "$(BLUE)🔧 Creating virtual environment...$(NC)"; \
 		uv venv $(VENV); \
+		echo "$(GREEN)✅ Virtual environment created$(NC)"; \
+	else \
+		echo "$(GREEN)✅ Virtual environment already exists$(NC)"; \
 	fi
 
-deps: venv
-	@echo "Installing dependencies..."
+.PHONY: deps
+deps: venv ## Install dependencies with uv
+	@echo "$(BLUE)📦 Installing dependencies...$(NC)"
 	@. $(VENV)/bin/activate && uv sync --all-groups
+	@echo "$(GREEN)✅ Dependencies installed$(NC)"
 
-keys:
-	@if [ ! -d "keys" ]; then \
-		echo "Generating signing keys..."; \
+# ==============================================================================
+# 🏗️ Build & Package
+# ==============================================================================
+
+.PHONY: keys
+keys: ## Generate signing keys if missing
+	@if [ ! -f keys/provider-private.key ]; then \
+		echo "$(BLUE)🔑 Generating signing keys...$(NC)"; \
 		mkdir -p keys; \
 		. $(VENV)/bin/activate && \
 		flavor keygen --out-dir keys; \
+		echo "$(GREEN)✅ Keys generated$(NC)"; \
 	else \
-		echo "Keys already exist in keys/ directory"; \
+		echo "$(GREEN)✅ Signing keys already exist$(NC)"; \
 	fi
 
-build: venv deps keys
-	@echo "Building provider binary..."
+.PHONY: build
+build: venv deps keys ## Build provider binary with FlavorPack
+	@echo "$(BLUE)🏗️ Building provider version $(VERSION) for $(CURRENT_PLATFORM)...$(NC)"
 	@. $(VENV)/bin/activate && \
 		flavor pack && \
+		echo "$(GREEN)✅ Provider built: $(PSP_FILE)$(NC)" && \
 		mkdir -p $(INSTALL_DIR) && \
 		cp $(PSP_FILE) $(VERSIONED_BINARY) && \
-		chmod +x $(VERSIONED_BINARY)
-	@echo "Built: $(VERSIONED_BINARY)"
+		chmod +x $(VERSIONED_BINARY) && \
+		echo "$(GREEN)✅ Versioned binary created: $(VERSIONED_BINARY)$(NC)" && \
+		ls -lh $(PSP_FILE) $(VERSIONED_BINARY)
 
-install: build
-	@echo "Provider installed to: $(INSTALL_DIR)"
+.PHONY: install
+install: build ## Install provider to local Terraform plugins directory
+	@echo "$(GREEN)✅ Provider installed to: $(INSTALL_DIR)$(NC)"
 	@ls -lh $(VERSIONED_BINARY)
-
-test: venv deps
-	@echo "Running tests..."
-	@. $(VENV)/bin/activate && pytest tests/
 
 plating: venv
 	@echo "Generating documentation with Plating..."
