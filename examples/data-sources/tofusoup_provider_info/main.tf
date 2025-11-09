@@ -2,7 +2,7 @@ terraform {
   required_providers {
     tofusoup = {
       source  = "local/providers/tofusoup"
-      version = "0.1.0"
+      version = "0.0.1108"
     }
   }
 }
