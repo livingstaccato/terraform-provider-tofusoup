@@ -194,7 +194,7 @@ class ModuleSearchDataSource(BaseDataSource[str, ModuleSearchState, ModuleSearch
 
             # Apply limit if specified
             if config.limit is not None:
-                modules = modules[: config.limit]
+                modules = modules[: int(config.limit)]
 
             # Convert Module objects to dicts
             results_data = [self._convert_module_to_dict(m) for m in modules]
