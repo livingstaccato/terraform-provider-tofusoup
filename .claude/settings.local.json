@@ -32,7 +32,8 @@
       "Bash(plating plate:*)",
       "Bash(xargs cat:*)",
       "Bash(curl:*)",
-      "Bash(make install:*)"
+      "Bash(make install:*)",
+      "Bash(PYTHONPATH=src pytest:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",

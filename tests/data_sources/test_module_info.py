@@ -124,9 +124,7 @@ class TestModuleInfoValidation:
     async def test_validate_invalid_registry_returns_error(self) -> None:
         """Test validation fails when registry is invalid."""
         ds = ModuleInfoDataSource()
-        config = ModuleInfoConfig(
-            namespace="terraform-aws-modules", name="vpc", provider="aws", registry="invalid"
-        )
+        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="invalid")
 
         errors = await ds._validate_config(config)
 
@@ -367,9 +365,7 @@ class TestModuleInfoErrorHandling:
     @pytest.mark.asyncio
     async def test_read_handles_module_not_found(self) -> None:
         """Test that read handles module not found error."""
-        config = ModuleInfoConfig(
-            namespace="nonexistent", name="module", provider="aws", registry="terraform"
-        )
+        config = ModuleInfoConfig(namespace="nonexistent", name="module", provider="aws", registry="terraform")
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -382,8 +378,8 @@ class TestModuleInfoErrorHandling:
 
         with patch("tofusoup.tf.components.data_sources.module_info.IBMTerraformRegistry") as mock_class:
             mock_class.return_value = mock_registry
-            # Should raise ValueError for no versions found
-            with pytest.raises(ValueError, match="No versions found for module"):
+            # Should raise DataSourceError for no versions found
+            with pytest.raises(DataSourceError, match="No versions found for module"):
                 await ds.read(ctx)
 
     @pytest.mark.asyncio
@@ -396,9 +392,9 @@ class TestModuleInfoErrorHandling:
         # Simulate HTTP error
         import httpx
 
-        mock_registry.list_module_versions = AsyncMock(side_effect=httpx.HTTPStatusError(
-            "Server error", request=AsyncMock(), response=AsyncMock(status_code=500)
-        ))
+        mock_registry.list_module_versions = AsyncMock(
+            side_effect=httpx.HTTPStatusError("Server error", request=AsyncMock(), response=AsyncMock(status_code=500))
+        )
         mock_registry.__aenter__ = AsyncMock(return_value=mock_registry)
         mock_registry.__aexit__ = AsyncMock(return_value=None)
 
@@ -406,7 +402,8 @@ class TestModuleInfoErrorHandling:
 
         with patch("tofusoup.tf.components.data_sources.module_info.IBMTerraformRegistry") as mock_class:
             mock_class.return_value = mock_registry
-            with pytest.raises(httpx.HTTPStatusError):
+            # Error is wrapped in DataSourceError
+            with pytest.raises(DataSourceError, match="Failed to query module info"):
                 await ds.read(ctx)
 
     @pytest.mark.asyncio
@@ -427,7 +424,8 @@ class TestModuleInfoErrorHandling:
 
         with patch("tofusoup.tf.components.data_sources.module_info.IBMTerraformRegistry") as mock_class:
             mock_class.return_value = mock_registry
-            with pytest.raises(httpx.ConnectError):
+            # Error is wrapped in DataSourceError
+            with pytest.raises(DataSourceError, match="Failed to query module info"):
                 await ds.read(ctx)
 
     @pytest.mark.asyncio
@@ -562,9 +560,7 @@ class TestModuleInfoEdgeCases:
             result = await ds.read(ctx)
 
         # Should use the first (latest) version
-        mock_registry.get_module_details.assert_called_once_with(
-            "terraform-aws-modules", "vpc", "aws", "6.5.0"
-        )
+        mock_registry.get_module_details.assert_called_once_with("terraform-aws-modules", "vpc", "aws", "6.5.0")
         assert result.version == "6.5.0"
 
 

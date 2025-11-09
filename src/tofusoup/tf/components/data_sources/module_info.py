@@ -6,7 +6,7 @@ information about a specific Terraform/OpenTofu module from registry APIs.
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import cast
 
 from attrs import define
 from provide.foundation import logger  # type: ignore
@@ -121,6 +121,9 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
     - `published_at` - Publication date string (ISO 8601 format)
     - `owner` - Module owner/maintainer username
     """
+
+    config_class = ModuleInfoConfig
+    state_class = ModuleInfoState
 
     async def _validate_config(self, config: ModuleInfoConfig) -> list[str]:
         """Validate the configuration. Returns list of error strings, or empty list if valid."""
@@ -260,9 +263,7 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
 
             # Check if module was found
             if not details:
-                raise DataSourceError(
-                    f"Module {module_id} not found in {config.registry or 'terraform'} registry"
-                )
+                raise DataSourceError(f"Module {module_id} not found in {config.registry or 'terraform'} registry")
 
             # Extract fields from the API response
             return ModuleInfoState(
@@ -292,6 +293,5 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
                 error=str(e),
             )
             raise DataSourceError(
-                f"Failed to query module info for {module_id} "
-                f"from {config.registry or 'terraform'} registry: {str(e)}"
+                f"Failed to query module info for {module_id} from {config.registry or 'terraform'} registry: {str(e)}"
             ) from e
