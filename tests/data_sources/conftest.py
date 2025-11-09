@@ -82,4 +82,22 @@ def sample_provider_versions() -> list[ProviderVersion]:
     ]
 
 
+@pytest.fixture
+def sample_module_response() -> dict[str, Any]:
+    """Sample module registry API response."""
+    return {
+        "id": "terraform-aws-modules/vpc/aws/6.5.0",
+        "namespace": "terraform-aws-modules",
+        "name": "vpc",
+        "provider": "aws",
+        "version": "6.5.0",
+        "owner": "antonbabenko",
+        "description": "Terraform module to create AWS VPC resources",
+        "source": "https://github.com/terraform-aws-modules/terraform-aws-vpc",
+        "downloads": 152826752,
+        "verified": False,
+        "published_at": "2025-10-21T21:09:25.665344Z",
+    }
+
+
 # 🐍🧪🔚
