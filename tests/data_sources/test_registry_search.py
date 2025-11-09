@@ -78,9 +78,7 @@ class TestRegistrySearchValidation:
     async def test_validate_config_valid(self):
         """Test validation with valid configuration."""
         ds = RegistrySearchDataSource()
-        config = RegistrySearchConfig(
-            query="aws", registry="terraform", resource_type="all", limit=50
-        )
+        config = RegistrySearchConfig(query="aws", registry="terraform", resource_type="all", limit=50)
         errors = await ds._validate_config(config)
         assert errors == []
 
@@ -238,9 +236,7 @@ class TestRegistrySearchRead:
         assert all(r["type"] == "module" for r in state.results)  # type: ignore
 
     @pytest.mark.asyncio
-    async def test_read_opentofu_registry_all_types(
-        self, sample_provider_search_results, sample_module_search_results
-    ):
+    async def test_read_opentofu_registry_all_types(self, sample_provider_search_results, sample_module_search_results):
         """Test reading from OpenTofu registry with all resource types."""
         ds = RegistrySearchDataSource()
         config = RegistrySearchConfig(query="aws", registry="opentofu", resource_type="all")
@@ -335,9 +331,7 @@ class TestRegistrySearchRead:
         assert state.registry == "terraform"
 
     @pytest.mark.asyncio
-    async def test_read_default_resource_type(
-        self, sample_provider_search_results, sample_module_search_results
-    ):
+    async def test_read_default_resource_type(self, sample_provider_search_results, sample_module_search_results):
         """Test that default resource_type is all."""
         ds = RegistrySearchDataSource()
         config = RegistrySearchConfig(query="aws")  # No resource_type specified
@@ -388,9 +382,7 @@ class TestRegistrySearchRead:
         assert state.results == []
 
     @pytest.mark.asyncio
-    async def test_read_mixed_results_conversion(
-        self, sample_provider_search_results, sample_module_search_results
-    ):
+    async def test_read_mixed_results_conversion(self, sample_provider_search_results, sample_module_search_results):
         """Test that mixed provider and module results are properly converted."""
         ds = RegistrySearchDataSource()
         config = RegistrySearchConfig(query="aws", registry="terraform")
@@ -427,9 +419,7 @@ class TestRegistrySearchRead:
         assert module_results[0]["tier"] is None  # N/A for modules
 
     @pytest.mark.asyncio
-    async def test_read_with_limit_applied(
-        self, sample_provider_search_results, sample_module_search_results
-    ):
+    async def test_read_with_limit_applied(self, sample_provider_search_results, sample_module_search_results):
         """Test that limit is properly applied to results."""
         ds = RegistrySearchDataSource()
         config = RegistrySearchConfig(query="aws", registry="terraform", limit=3)
@@ -454,14 +444,10 @@ class TestRegistrySearchRead:
         assert len(state.results) == 3  # type: ignore
 
     @pytest.mark.asyncio
-    async def test_read_preserves_config_values(
-        self, sample_provider_search_results, sample_module_search_results
-    ):
+    async def test_read_preserves_config_values(self, sample_provider_search_results, sample_module_search_results):
         """Test that config values are preserved in state."""
         ds = RegistrySearchDataSource()
-        config = RegistrySearchConfig(
-            query="kubernetes", registry="opentofu", resource_type="modules", limit=25
-        )
+        config = RegistrySearchConfig(query="kubernetes", registry="opentofu", resource_type="modules", limit=25)
         ctx = ResourceContext(config=config, state=None)
 
         from unittest.mock import AsyncMock, MagicMock, patch
@@ -512,9 +498,7 @@ class TestRegistrySearchRead:
         assert state.result_count == expected_provider_count + expected_module_count
 
     @pytest.mark.asyncio
-    async def test_read_result_type_field(
-        self, sample_provider_search_results, sample_module_search_results
-    ):
+    async def test_read_result_type_field(self, sample_provider_search_results, sample_module_search_results):
         """Test that each result has a type field."""
         ds = RegistrySearchDataSource()
         config = RegistrySearchConfig(query="aws", registry="terraform")
@@ -743,9 +727,7 @@ class TestRegistrySearchEdgeCases:
         assert state.query == "test-query_123"
 
     @pytest.mark.asyncio
-    async def test_read_with_many_mixed_results(
-        self, sample_provider_search_results, sample_module_search_results
-    ):
+    async def test_read_with_many_mixed_results(self, sample_provider_search_results, sample_module_search_results):
         """Test handling of many mixed results."""
         ds = RegistrySearchDataSource()
         config = RegistrySearchConfig(query="aws", registry="terraform", limit=100)
@@ -820,9 +802,7 @@ class TestRegistrySearchEdgeCases:
             assert result["type"] == "module"
 
     @pytest.mark.asyncio
-    async def test_read_limit_applies_after_merge(
-        self, sample_provider_search_results, sample_module_search_results
-    ):
+    async def test_read_limit_applies_after_merge(self, sample_provider_search_results, sample_module_search_results):
         """Test that limit is applied after merging provider and module results."""
         ds = RegistrySearchDataSource()
         config = RegistrySearchConfig(query="aws", registry="terraform", limit=3)
@@ -847,9 +827,7 @@ class TestRegistrySearchEdgeCases:
         assert state.result_count == 3
 
     @pytest.mark.asyncio
-    async def test_read_all_includes_both_types(
-        self, sample_provider_search_results, sample_module_search_results
-    ):
+    async def test_read_all_includes_both_types(self, sample_provider_search_results, sample_module_search_results):
         """Test that resource_type='all' includes both providers and modules."""
         ds = RegistrySearchDataSource()
         config = RegistrySearchConfig(query="aws", resource_type="all")
