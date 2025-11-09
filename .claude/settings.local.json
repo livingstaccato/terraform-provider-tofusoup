@@ -51,7 +51,8 @@
       "Bash(xargs:*)",
       "Bash(terraform plan:*)",
       "Bash(make:*)",
-      "Bash(. .venv/bin/activate)"
+      "Bash(. .venv/bin/activate)",
+      "Bash(mkdocs.yml)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
