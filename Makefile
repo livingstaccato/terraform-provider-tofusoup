@@ -236,39 +236,26 @@ clean-all: clean clean-docs clean-plating clean-examples clean-workenv ## Deep c
 # 📚 Documentation
 # ==============================================================================
 
+.PHONY: plating
+plating: venv ## Generate documentation with Plating
+	$(call print,$(BLUE)📚 Generating documentation with Plating...$(NC))
+	@. .venv/bin/activate && \
+		plating plate
+	$(call print,$(GREEN)✅ Documentation generated$(NC))
+
+.PHONY: docs-build
+docs-build: docs-setup plating ## Build documentation (setup + plating + mkdocs)
+	$(call print,$(BLUE)📚 Building documentation with MkDocs...$(NC))
+	@. .venv/bin/activate && mkdocs build
+	$(call print,$(GREEN)✅ Documentation built$(NC))
+
 .PHONY: docs
-docs: venv clean-docs docs-setup ## Build documentation with plating (cleans first)
-	$(call print,$(BLUE)📚 Building documentation...$(NC))
-	@SKIP_DOCS=$(SKIP_DOCS) bash scripts/build-docs.sh
-	@if [ "$(SKIP_DOCS)" = "true" ]; then \
-		printf '%b\n' "$(YELLOW)⏭️  Documentation generation was skipped (SKIP_DOCS=true)$(NC)"; \
-	fi
-
-.PHONY: inject-partials
-inject-partials: ## Inject global partials into component templates
-	$(call print,$(BLUE)🔧 Injecting global partials...$(NC))
-	@python3 scripts/inject_global_partials.py
-	$(call print,$(GREEN)✅ Global partials injected$(NC))
-
-.PHONY: inject-partials-dry-run
-inject-partials-dry-run: ## Preview global partial injections (dry-run)
-	$(call print,$(BLUE)📋 Preview: injecting global partials (dry-run)...$(NC))
-	@python3 scripts/inject_global_partials.py --dry-run
-
-.PHONY: generate-docs
-generate-docs: venv deps ## Generate documentation and examples with plating CLI
-	$(call print,$(BLUE)📚 Generating docs and examples...$(NC))
-	@bash scripts/generate_docs_and_examples.sh
-
-.PHONY: validate-examples
-validate-examples: ## Validate all Terraform examples
-	$(call print,$(BLUE)🔍 Validating examples...$(NC))
-	@bash scripts/validate_examples.sh
+docs: docs-build ## Build documentation
 
 .PHONY: lint-examples
 lint-examples: ## Run terraform fmt on examples
 	$(call print,$(BLUE)🎨 Formatting examples...$(NC))
-	@terraform fmt -recursive examples/ || true
+	@terraform fmt -recursive examples/ 2>/dev/null || true
 	$(call print,$(GREEN)✅ Examples formatted$(NC))
 
 .PHONY: docs-setup
@@ -278,11 +265,11 @@ docs-setup: venv ## Extract theme assets from provide-foundry
 	$(call print,$(GREEN)✅ Theme assets ready$(NC))
 
 .PHONY: docs-serve
-docs-serve: docs-setup docs ## Build and serve documentation locally
+docs-serve: docs-setup ## Serve documentation locally
 	$(call print,$(BLUE)🌐 Serving documentation at:$(NC))
-	$(call print,$(GREEN)  http://127.0.0.1:8010/providers/provide-io/pyvider/latest/docs/$(NC))
-	$(call print,$(YELLOW)⚠️  Note: Full path required for Terraform Registry compatibility$(NC))
-	@mkdocs serve
+	$(call print,$(GREEN)  http://127.0.0.1:8000$(NC))
+	@. .venv/bin/activate && \
+		mkdocs serve
 
 # ==============================================================================
 # 🧪 Testing & Validation
