@@ -236,6 +236,12 @@ clean-all: clean clean-docs clean-plating clean-examples clean-workenv ## Deep c
 # 📚 Documentation
 # ==============================================================================
 
+.PHONY: docs-setup
+docs-setup: venv ## Extract theme assets from provide-foundry
+	$(call print,$(BLUE)📦 Extracting theme assets from provide-foundry...$(NC))
+	@. .venv/bin/activate && python -c "from provide.foundry.config import extract_base_mkdocs; from pathlib import Path; extract_base_mkdocs(Path('.'))"
+	$(call print,$(GREEN)✅ Theme assets ready$(NC))
+
 .PHONY: plating
 plating: venv ## Generate documentation with Plating
 	$(call print,$(BLUE)📚 Generating documentation with Plating...$(NC))
@@ -252,24 +258,18 @@ docs-build: docs-setup plating ## Build documentation (setup + plating + mkdocs)
 .PHONY: docs
 docs: docs-build ## Build documentation
 
-.PHONY: lint-examples
-lint-examples: ## Run terraform fmt on examples
-	$(call print,$(BLUE)🎨 Formatting examples...$(NC))
-	@terraform fmt -recursive examples/ 2>/dev/null || true
-	$(call print,$(GREEN)✅ Examples formatted$(NC))
-
-.PHONY: docs-setup
-docs-setup: venv ## Extract theme assets from provide-foundry
-	$(call print,$(BLUE)📦 Extracting theme assets from provide-foundry...$(NC))
-	@. .venv/bin/activate && python -c "from provide.foundry.config import extract_base_mkdocs; from pathlib import Path; extract_base_mkdocs(Path('.'))"
-	$(call print,$(GREEN)✅ Theme assets ready$(NC))
-
 .PHONY: docs-serve
 docs-serve: docs-setup ## Serve documentation locally
 	$(call print,$(BLUE)🌐 Serving documentation at:$(NC))
 	$(call print,$(GREEN)  http://127.0.0.1:8000$(NC))
 	@. .venv/bin/activate && \
 		mkdocs serve
+
+.PHONY: lint-examples
+lint-examples: ## Run terraform fmt on examples
+	$(call print,$(BLUE)🎨 Formatting examples...$(NC))
+	@terraform fmt -recursive examples/ 2>/dev/null || true
+	$(call print,$(GREEN)✅ Examples formatted$(NC))
 
 # ==============================================================================
 # 🧪 Testing & Validation
