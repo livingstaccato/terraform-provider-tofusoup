@@ -27,7 +27,8 @@
       "Bash(uv pip list:*)",
       "Bash(plating plate)",
       "Bash(terraform init:*)",
-      "Bash(terraform apply:*)"
+      "Bash(terraform apply:*)",
+      "Bash(terraform destroy:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
