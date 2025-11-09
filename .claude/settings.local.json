@@ -40,7 +40,8 @@
       "Bash(HANDOFF-PART-08.md)",
       "Bash(terraform show:*)",
       "Bash(terraform output:*)",
-      "Bash(/dev/null)"
+      "Bash(/dev/null)",
+      "Bash(echo \"\n=== RESEARCH FILES CREATED ===\")"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
