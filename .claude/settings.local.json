@@ -48,7 +48,8 @@
       "Bash(terraform -chdir=/Users/tim/code/gh/provide-io/terraform-provider-tofusoup/examples/data-sources/tofusoup_state_outputs apply:*)",
       "Bash(make docs:*)",
       "Bash(pyvider --help:*)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Bash(terraform plan:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",

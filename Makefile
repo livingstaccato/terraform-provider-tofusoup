@@ -1,4 +1,4 @@
-.PHONY: help venv deps build install test docs docs-serve clean keys
+.PHONY: help venv deps build install test plating docs-setup docs-build docs docs-serve clean keys
 
 # Configuration
 PROVIDER_NAME := terraform-provider-tofusoup
@@ -39,7 +39,10 @@ help:
 	@echo "  build       - Build provider binary with FlavorPack"
 	@echo "  install     - Install provider to local Terraform plugins directory"
 	@echo "  test        - Run tests"
-	@echo "  docs        - Generate documentation with Plating"
+	@echo "  plating     - Generate documentation with Plating"
+	@echo "  docs-setup  - Extract theme assets from provide-foundry"
+	@echo "  docs-build  - Build documentation (setup + plating + mkdocs)"
+	@echo "  docs        - Build documentation"
 	@echo "  docs-serve  - Serve documentation locally"
 	@echo "  clean       - Clean build artifacts"
 	@echo ""
@@ -83,12 +86,23 @@ test: venv deps
 	@echo "Running tests..."
 	@. $(VENV)/bin/activate && pytest tests/
 
-docs: venv deps
+plating: venv
 	@echo "Generating documentation with Plating..."
 	@. $(VENV)/bin/activate && \
-		plating plate --provider-name tofusoup
+		plating plate
 
-docs-serve: docs
+docs-setup:
+	@echo "Extracting theme assets from provide-foundry..."
+	@python3 -c "from provide.foundry.config import extract_base_mkdocs; from pathlib import Path; extract_base_mkdocs(Path('.'))"
+
+docs-build: docs-setup plating
+	@echo "Building documentation with MkDocs..."
+	@mkdocs build
+
+docs: docs-build
+	@echo "Documentation built successfully"
+
+docs-serve: docs-setup docs
 	@echo "Serving documentation at http://localhost:8000"
 	@. $(VENV)/bin/activate && \
 		mkdocs serve
