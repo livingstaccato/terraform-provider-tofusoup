@@ -6,6 +6,14 @@ from tofusoup.tf.components.data_sources import (
     module_versions,
     provider_info,
     provider_versions,
+    registry_search,
 )
 
-__all__ = ["module_info", "module_search", "module_versions", "provider_info", "provider_versions"]
+__all__ = [
+    "module_info",
+    "module_search",
+    "module_versions",
+    "provider_info",
+    "provider_versions",
+    "registry_search",
+]
