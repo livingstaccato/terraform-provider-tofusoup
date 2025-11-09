@@ -66,17 +66,13 @@ output "all_results_with_type" {
   ]
 }
 
-output "top_downloaded_aws_modules" {
-  description = "Top 5 most downloaded AWS modules"
-  value = slice(
-    sort([
-      for r in data.tofusoup_registry_search.aws.results :
-      {
-        name      = r.name
-        downloads = r.downloads
-      } if r.type == "module"
-    ], "downloads"),
-    0,
-    min(5, length([for r in data.tofusoup_registry_search.aws.results : r if r.type == "module"]))
-  )
+output "aws_module_downloads" {
+  description = "AWS modules with download counts"
+  value = [
+    for r in data.tofusoup_registry_search.aws.results :
+    {
+      name      = r.name
+      downloads = r.downloads
+    } if r.type == "module"
+  ]
 }
