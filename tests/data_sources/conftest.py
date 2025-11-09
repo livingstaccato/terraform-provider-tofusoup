@@ -5,10 +5,12 @@
 
 """Shared test fixtures for data source tests."""
 
+from datetime import datetime
 from typing import Any
 
 import pytest
 from pyvider.resources.context import ResourceContext  # type: ignore
+from tofusoup.registry.models.module import ModuleVersion  # type: ignore
 from tofusoup.registry.models.provider import ProviderPlatform, ProviderVersion  # type: ignore
 
 from tofusoup.tf.components.data_sources.provider_info import ProviderInfoConfig  # type: ignore
@@ -98,6 +100,37 @@ def sample_module_response() -> dict[str, Any]:
         "verified": False,
         "published_at": "2025-10-21T21:09:25.665344Z",
     }
+
+
+@pytest.fixture
+def sample_module_versions() -> list[ModuleVersion]:
+    """Sample module versions list."""
+    return [
+        ModuleVersion(
+            version="6.5.0",
+            published_at=datetime.fromisoformat("2025-10-21T21:09:25.665344"),
+            readme_content="# VPC Module",
+            inputs=[],
+            outputs=[],
+            resources=[],
+        ),
+        ModuleVersion(
+            version="6.4.0",
+            published_at=datetime.fromisoformat("2025-09-15T10:00:00"),
+            readme_content="# VPC Module 6.4.0",
+            inputs=[],
+            outputs=[],
+            resources=[],
+        ),
+        ModuleVersion(
+            version="6.3.0",
+            published_at=datetime.fromisoformat("2025-08-01T12:30:00"),
+            readme_content=None,
+            inputs=[],
+            outputs=[],
+            resources=[],
+        ),
+    ]
 
 
 # 🐍🧪🔚
