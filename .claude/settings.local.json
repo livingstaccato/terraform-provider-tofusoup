@@ -31,7 +31,8 @@
       "Bash(terraform destroy:*)",
       "Bash(plating plate:*)",
       "Bash(xargs cat:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(make install:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
