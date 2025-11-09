@@ -28,7 +28,8 @@
       "Bash(plating plate)",
       "Bash(terraform init:*)",
       "Bash(terraform apply:*)",
-      "Bash(terraform destroy:*)"
+      "Bash(terraform destroy:*)",
+      "Bash(plating plate:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
