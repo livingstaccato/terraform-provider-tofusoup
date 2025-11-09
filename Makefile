@@ -4,8 +4,8 @@
 # TODO: Establish formal Makefile template system in provide-foundry for consistency across all provider projects.
 
 # Configuration - Auto-discovered from pyproject.toml
-PROVIDER_NAME := $(shell grep '^name = ' pyproject.toml | cut -d'"' -f2)
-VERSION := $(shell grep '^version = ' pyproject.toml | cut -d'"' -f2)
+PROVIDER_NAME := $(shell grep '^name = ' pyproject.toml | head -1 | cut -d'"' -f2)
+VERSION := $(shell grep '^version = ' pyproject.toml | head -1 | cut -d'"' -f2)
 PROVIDER_SHORT_NAME := $(shell echo $(PROVIDER_NAME) | sed 's/terraform-provider-//')
 SHELL := /bin/bash
 
