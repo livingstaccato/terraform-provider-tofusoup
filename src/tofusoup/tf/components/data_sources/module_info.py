@@ -29,13 +29,13 @@ class ModuleInfoConfig:
     Attributes:
         namespace: Module namespace (e.g., "terraform-aws-modules")
         name: Module name (e.g., "vpc")
-        provider: Target provider (e.g., "aws")
+        target_provider: Target provider (e.g., "aws")
         registry: Registry to query - "terraform" or "opentofu" (default: "terraform")
     """
 
     namespace: str
     name: str
-    provider: str
+    target_provider: str
     registry: str | None = "terraform"
 
 
@@ -46,7 +46,7 @@ class ModuleInfoState:
     Attributes:
         namespace: Module namespace
         name: Module name
-        provider: Target provider
+        target_provider: Target provider
         registry: Registry queried
         version: Latest version string
         description: Module description
@@ -59,7 +59,7 @@ class ModuleInfoState:
 
     namespace: str | None = None
     name: str | None = None
-    provider: str | None = None
+    target_provider: str | None = None
     registry: str | None = None
     version: str | None = None
     description: str | None = None
@@ -79,10 +79,10 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
     ```terraform
     # Query VPC module from Terraform registry
     data "tofusoup_module_info" "vpc" {
-      namespace = "terraform-aws-modules"
-      name      = "vpc"
-      provider  = "aws"
-      registry  = "terraform"
+      namespace       = "terraform-aws-modules"
+      name            = "vpc"
+      target_provider = "aws"
+      registry        = "terraform"
     }
 
     output "vpc_source" {
@@ -97,10 +97,10 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
 
     # Query compute module from OpenTofu registry
     data "tofusoup_module_info" "compute" {
-      namespace = "Azure"
-      name      = "compute"
-      provider  = "azurerm"
-      registry  = "opentofu"
+      namespace       = "Azure"
+      name            = "compute"
+      target_provider = "azurerm"
+      registry        = "opentofu"
     }
     ```
 
@@ -108,7 +108,7 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
 
     - `namespace` - (Required) Module namespace (e.g., "terraform-aws-modules")
     - `name` - (Required) Module name (e.g., "vpc")
-    - `provider` - (Required) Target provider (e.g., "aws")
+    - `target_provider` - (Required) Target provider (e.g., "aws")
     - `registry` - (Optional) Registry to query: "terraform" or "opentofu", default: "terraform"
 
     ## Attribute Reference
@@ -132,8 +132,8 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
             errors.append("'namespace' is required and cannot be empty.")
         if not config.name:
             errors.append("'name' is required and cannot be empty.")
-        if not config.provider:
-            errors.append("'provider' is required and cannot be empty.")
+        if not config.target_provider:
+            errors.append("'target_provider' is required and cannot be empty.")
         if config.registry and config.registry not in ["terraform", "opentofu"]:
             errors.append("'registry' must be either 'terraform' or 'opentofu'.")
         return errors
@@ -156,7 +156,7 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
                     required=True,
                     description="Module name (e.g., 'vpc')",
                 ),
-                "provider": a_str(
+                "target_provider": a_str(
                     required=True,
                     description="Target provider (e.g., 'aws')",
                 ),
@@ -219,13 +219,13 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
             "Querying module info",
             namespace=config.namespace,
             name=config.name,
-            provider=config.provider,
+            target_provider=config.target_provider,
             registry=config.registry or "terraform",
         )
 
         try:
             # Construct module identifier for version query
-            module_id = f"{config.namespace}/{config.name}/{config.provider}"
+            module_id = f"{config.namespace}/{config.name}/{config.target_provider}"
 
             # Determine which registry to use
             if config.registry == "opentofu":
@@ -241,7 +241,7 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
                     details = await registry.get_module_details(
                         config.namespace,
                         config.name,
-                        config.provider,
+                        config.target_provider,
                         latest_version,
                     )
             else:
@@ -257,7 +257,7 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
                     details = await registry.get_module_details(
                         config.namespace,
                         config.name,
-                        config.provider,
+                        config.target_provider,
                         latest_version,
                     )
 
@@ -269,7 +269,7 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
             return ModuleInfoState(
                 namespace=config.namespace,
                 name=config.name,
-                provider=config.provider,
+                target_provider=config.target_provider,
                 registry=config.registry,
                 version=details.get("version"),
                 description=details.get("description"),
@@ -288,7 +288,7 @@ class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig
                 "Failed to query module info",
                 namespace=config.namespace,
                 name=config.name,
-                provider=config.provider,
+                target_provider=config.target_provider,
                 registry=config.registry or "terraform",
                 error=str(e),
             )

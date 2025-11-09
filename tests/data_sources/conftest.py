@@ -89,7 +89,7 @@ def sample_module_response() -> dict[str, Any]:
         "id": "terraform-aws-modules/vpc/aws/6.5.0",
         "namespace": "terraform-aws-modules",
         "name": "vpc",
-        "provider": "aws",
+        "target_provider": "aws",
         "version": "6.5.0",
         "owner": "antonbabenko",
         "description": "Terraform module to create AWS VPC resources",

@@ -15,40 +15,40 @@ provider "tofusoup" {
 
 # Query VPC module from Terraform registry
 data "tofusoup_module_info" "vpc" {
-  namespace = "terraform-aws-modules"
-  name      = "vpc"
-  provider  = "aws"
-  registry  = "terraform"
+  namespace       = "terraform-aws-modules"
+  name            = "vpc"
+  target_provider = "aws"
+  registry        = "terraform"
 }
 
 # Query EKS module from Terraform registry
 data "tofusoup_module_info" "eks" {
-  namespace = "terraform-aws-modules"
-  name      = "eks"
-  provider  = "aws"
-  registry  = "terraform"
+  namespace       = "terraform-aws-modules"
+  name            = "eks"
+  target_provider = "aws"
+  registry        = "terraform"
 }
 
 # Query security group module with default registry (terraform)
 data "tofusoup_module_info" "security_group" {
-  namespace = "terraform-aws-modules"
-  name      = "security-group"
-  provider  = "aws"
+  namespace       = "terraform-aws-modules"
+  name            = "security-group"
+  target_provider = "aws"
   # registry defaults to "terraform"
 }
 
 # Query Azure compute module
 data "tofusoup_module_info" "azure_compute" {
-  namespace = "Azure"
-  name      = "compute"
-  provider  = "azurerm"
-  registry  = "terraform"
+  namespace       = "Azure"
+  name            = "compute"
+  target_provider = "azurerm"
+  registry        = "terraform"
 }
 
 # Query Google Cloud network module
 data "tofusoup_module_info" "gcp_network" {
-  namespace = "terraform-google-modules"
-  name      = "network"
-  provider  = "google"
-  registry  = "terraform"
+  namespace       = "terraform-google-modules"
+  name            = "network"
+  target_provider = "google"
+  registry        = "terraform"
 }

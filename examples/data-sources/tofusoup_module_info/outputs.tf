@@ -88,38 +88,38 @@ output "module_summary" {
   description = "Summary of all queried modules"
   value = {
     vpc = {
-      namespace    = data.tofusoup_module_info.vpc.namespace
-      name         = data.tofusoup_module_info.vpc.name
-      provider     = data.tofusoup_module_info.vpc.provider
-      version      = data.tofusoup_module_info.vpc.version
-      downloads    = data.tofusoup_module_info.vpc.downloads
-      verified     = data.tofusoup_module_info.vpc.verified
-      owner        = data.tofusoup_module_info.vpc.owner
+      namespace       = data.tofusoup_module_info.vpc.namespace
+      name            = data.tofusoup_module_info.vpc.name
+      target_provider = data.tofusoup_module_info.vpc.target_provider
+      version         = data.tofusoup_module_info.vpc.version
+      downloads       = data.tofusoup_module_info.vpc.downloads
+      verified        = data.tofusoup_module_info.vpc.verified
+      owner           = data.tofusoup_module_info.vpc.owner
     }
     eks = {
-      namespace    = data.tofusoup_module_info.eks.namespace
-      name         = data.tofusoup_module_info.eks.name
-      provider     = data.tofusoup_module_info.eks.provider
-      version      = data.tofusoup_module_info.eks.version
-      downloads    = data.tofusoup_module_info.eks.downloads
-      verified     = data.tofusoup_module_info.eks.verified
-      owner        = data.tofusoup_module_info.eks.owner
+      namespace       = data.tofusoup_module_info.eks.namespace
+      name            = data.tofusoup_module_info.eks.name
+      target_provider = data.tofusoup_module_info.eks.target_provider
+      version         = data.tofusoup_module_info.eks.version
+      downloads       = data.tofusoup_module_info.eks.downloads
+      verified        = data.tofusoup_module_info.eks.verified
+      owner           = data.tofusoup_module_info.eks.owner
     }
     azure_compute = {
-      namespace    = data.tofusoup_module_info.azure_compute.namespace
-      name         = data.tofusoup_module_info.azure_compute.name
-      provider     = data.tofusoup_module_info.azure_compute.provider
-      version      = data.tofusoup_module_info.azure_compute.version
-      downloads    = data.tofusoup_module_info.azure_compute.downloads
-      verified     = data.tofusoup_module_info.azure_compute.verified
+      namespace       = data.tofusoup_module_info.azure_compute.namespace
+      name            = data.tofusoup_module_info.azure_compute.name
+      target_provider = data.tofusoup_module_info.azure_compute.target_provider
+      version         = data.tofusoup_module_info.azure_compute.version
+      downloads       = data.tofusoup_module_info.azure_compute.downloads
+      verified        = data.tofusoup_module_info.azure_compute.verified
     }
     gcp_network = {
-      namespace    = data.tofusoup_module_info.gcp_network.namespace
-      name         = data.tofusoup_module_info.gcp_network.name
-      provider     = data.tofusoup_module_info.gcp_network.provider
-      version      = data.tofusoup_module_info.gcp_network.version
-      downloads    = data.tofusoup_module_info.gcp_network.downloads
-      verified     = data.tofusoup_module_info.gcp_network.verified
+      namespace       = data.tofusoup_module_info.gcp_network.namespace
+      name            = data.tofusoup_module_info.gcp_network.name
+      target_provider = data.tofusoup_module_info.gcp_network.target_provider
+      version         = data.tofusoup_module_info.gcp_network.version
+      downloads       = data.tofusoup_module_info.gcp_network.downloads
+      verified        = data.tofusoup_module_info.gcp_network.verified
     }
   }
 }

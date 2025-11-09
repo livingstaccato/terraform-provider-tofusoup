@@ -1,25 +1,25 @@
 # Query VPC module from Terraform registry
 data "tofusoup_module_info" "vpc" {
-  namespace = "terraform-aws-modules"
-  name      = "vpc"
-  provider  = "aws"
-  registry  = "terraform"
+  namespace       = "terraform-aws-modules"
+  name            = "vpc"
+  target_provider = "aws"
+  registry        = "terraform"
 }
 
 # Query EKS module from Terraform registry
 data "tofusoup_module_info" "eks" {
-  namespace = "terraform-aws-modules"
-  name      = "eks"
-  provider  = "aws"
-  registry  = "terraform"
+  namespace       = "terraform-aws-modules"
+  name            = "eks"
+  target_provider = "aws"
+  registry        = "terraform"
 }
 
 # Query compute module from Azure (Terraform registry)
 data "tofusoup_module_info" "azure_compute" {
-  namespace = "Azure"
-  name      = "compute"
-  provider  = "azurerm"
-  registry  = "terraform"
+  namespace       = "Azure"
+  name            = "compute"
+  target_provider = "azurerm"
+  registry        = "terraform"
 }
 
 # Outputs demonstrating module information access

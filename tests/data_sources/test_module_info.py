@@ -39,7 +39,7 @@ class TestModuleInfoDataSource:
         # Schema has a block attribute which contains the attributes
         assert "namespace" in schema.block.attributes
         assert "name" in schema.block.attributes
-        assert "provider" in schema.block.attributes
+        assert "target_provider" in schema.block.attributes
         assert "registry" in schema.block.attributes
         assert "version" in schema.block.attributes
         assert "description" in schema.block.attributes
@@ -51,21 +51,23 @@ class TestModuleInfoDataSource:
 
     def test_config_class_is_frozen(self) -> None:
         """Test that ModuleInfoConfig is immutable (frozen)."""
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
 
         with pytest.raises(FrozenInstanceError):
             config.namespace = "new_namespace"
 
     def test_state_class_is_frozen(self) -> None:
         """Test that ModuleInfoState is immutable (frozen)."""
-        state = ModuleInfoState(namespace="terraform-aws-modules", name="vpc", provider="aws", version="6.5.0")
+        state = ModuleInfoState(namespace="terraform-aws-modules", name="vpc", target_provider="aws", version="6.5.0")
 
         with pytest.raises(FrozenInstanceError):
             state.version = "7.0.0"
 
     def test_config_defaults(self) -> None:
         """Test that ModuleInfoConfig has correct default values."""
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws")
+        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", target_provider="aws")
         assert config.registry == "terraform"
 
     def test_state_defaults(self) -> None:
@@ -73,7 +75,7 @@ class TestModuleInfoDataSource:
         state = ModuleInfoState()
         assert state.namespace is None
         assert state.name is None
-        assert state.provider is None
+        assert state.target_provider is None
         assert state.registry is None
         assert state.version is None
         assert state.description is None
@@ -91,7 +93,7 @@ class TestModuleInfoValidation:
     async def test_validate_empty_namespace_returns_error(self) -> None:
         """Test validation fails when namespace is empty."""
         ds = ModuleInfoDataSource()
-        config = ModuleInfoConfig(namespace="", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(namespace="", name="vpc", target_provider="aws", registry="terraform")
 
         errors = await ds._validate_config(config)
 
@@ -102,7 +104,9 @@ class TestModuleInfoValidation:
     async def test_validate_empty_name_returns_error(self) -> None:
         """Test validation fails when name is empty."""
         ds = ModuleInfoDataSource()
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="", target_provider="aws", registry="terraform"
+        )
 
         errors = await ds._validate_config(config)
 
@@ -110,21 +114,25 @@ class TestModuleInfoValidation:
         assert "'name' is required and cannot be empty." in errors
 
     @pytest.mark.asyncio
-    async def test_validate_empty_provider_returns_error(self) -> None:
+    async def test_validate_empty_target_provider_returns_error(self) -> None:
         """Test validation fails when provider is empty."""
         ds = ModuleInfoDataSource()
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="", registry="terraform"
+        )
 
         errors = await ds._validate_config(config)
 
         assert len(errors) == 1
-        assert "'provider' is required and cannot be empty." in errors
+        assert "'target_provider' is required and cannot be empty." in errors
 
     @pytest.mark.asyncio
     async def test_validate_invalid_registry_returns_error(self) -> None:
         """Test validation fails when registry is invalid."""
         ds = ModuleInfoDataSource()
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="invalid")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="invalid"
+        )
 
         errors = await ds._validate_config(config)
 
@@ -135,7 +143,9 @@ class TestModuleInfoValidation:
     async def test_validate_valid_config_returns_no_errors(self) -> None:
         """Test validation passes with valid config."""
         ds = ModuleInfoDataSource()
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
 
         errors = await ds._validate_config(config)
 
@@ -145,14 +155,14 @@ class TestModuleInfoValidation:
     async def test_validate_multiple_errors_returns_all(self) -> None:
         """Test validation returns all errors when multiple fields are invalid."""
         ds = ModuleInfoDataSource()
-        config = ModuleInfoConfig(namespace="", name="", provider="", registry="invalid")
+        config = ModuleInfoConfig(namespace="", name="", target_provider="", registry="invalid")
 
         errors = await ds._validate_config(config)
 
         assert len(errors) == 4
         assert "'namespace' is required and cannot be empty." in errors
         assert "'name' is required and cannot be empty." in errors
-        assert "'provider' is required and cannot be empty." in errors
+        assert "'target_provider' is required and cannot be empty." in errors
         assert "'registry' must be either 'terraform' or 'opentofu'." in errors
 
 
@@ -162,7 +172,9 @@ class TestModuleInfoRead:
     @pytest.mark.asyncio
     async def test_read_terraform_registry_success(self, sample_module_response: dict[str, Any]) -> None:
         """Test successful read from Terraform registry."""
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
         ctx = ResourceContext(config=config, state=None)
 
         # Mock the registry client
@@ -183,7 +195,7 @@ class TestModuleInfoRead:
 
         assert result.namespace == "terraform-aws-modules"
         assert result.name == "vpc"
-        assert result.provider == "aws"
+        assert result.target_provider == "aws"
         assert result.registry == "terraform"
         assert result.version == "6.5.0"
         assert result.description == "Terraform module to create AWS VPC resources"
@@ -199,7 +211,7 @@ class TestModuleInfoRead:
         opentofu_response = {
             "namespace": "aws-ia",
             "name": "vpc",
-            "provider": "aws",
+            "target_provider": "aws",
             "version": "4.2.0",
             "description": "AWS VPC module for OpenTofu",
             "source": "https://github.com/aws-ia/terraform-aws-vpc",
@@ -209,7 +221,7 @@ class TestModuleInfoRead:
             "owner": "aws-ia-team",
         }
 
-        config = ModuleInfoConfig(namespace="aws-ia", name="vpc", provider="aws", registry="opentofu")
+        config = ModuleInfoConfig(namespace="aws-ia", name="vpc", target_provider="aws", registry="opentofu")
         ctx = ResourceContext(config=config, state=None)
 
         # Mock the registry client
@@ -228,7 +240,7 @@ class TestModuleInfoRead:
 
         assert result.namespace == "aws-ia"
         assert result.name == "vpc"
-        assert result.provider == "aws"
+        assert result.target_provider == "aws"
         assert result.registry == "opentofu"
         assert result.version == "4.2.0"
         assert result.verified is True
@@ -237,7 +249,7 @@ class TestModuleInfoRead:
     async def test_read_default_registry_uses_terraform(self, sample_module_response: dict[str, Any]) -> None:
         """Test that default registry value uses Terraform registry."""
         # Not specifying registry, should default to "terraform"
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws")
+        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", target_provider="aws")
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -259,7 +271,9 @@ class TestModuleInfoRead:
     @pytest.mark.asyncio
     async def test_read_maps_all_response_fields(self, sample_module_response: dict[str, Any]) -> None:
         """Test that all fields from registry response are mapped correctly."""
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -291,11 +305,13 @@ class TestModuleInfoRead:
         minimal_response: dict[str, Any] = {
             "namespace": "terraform-aws-modules",
             "name": "vpc",
-            "provider": "aws",
+            "target_provider": "aws",
             "version": "6.5.0",
         }
 
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -314,7 +330,7 @@ class TestModuleInfoRead:
         # Should not crash, optional fields should be None
         assert result.namespace == "terraform-aws-modules"
         assert result.name == "vpc"
-        assert result.provider == "aws"
+        assert result.target_provider == "aws"
         assert result.version == "6.5.0"
         assert result.description is None
         assert result.source_url is None
@@ -326,7 +342,9 @@ class TestModuleInfoRead:
     @pytest.mark.asyncio
     async def test_read_preserves_config_values(self, sample_module_response: dict[str, Any]) -> None:
         """Test that config values are preserved in the result state."""
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -345,7 +363,7 @@ class TestModuleInfoRead:
         # Config values should be echoed back in state
         assert result.namespace == config.namespace
         assert result.name == config.name
-        assert result.provider == config.provider
+        assert result.target_provider == config.target_provider
         assert result.registry == config.registry
 
 
@@ -365,7 +383,7 @@ class TestModuleInfoErrorHandling:
     @pytest.mark.asyncio
     async def test_read_handles_module_not_found(self) -> None:
         """Test that read handles module not found error."""
-        config = ModuleInfoConfig(namespace="nonexistent", name="module", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(namespace="nonexistent", name="module", target_provider="aws", registry="terraform")
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -385,7 +403,9 @@ class TestModuleInfoErrorHandling:
     @pytest.mark.asyncio
     async def test_read_handles_http_error(self) -> None:
         """Test that read handles HTTP errors (5xx)."""
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -409,7 +429,9 @@ class TestModuleInfoErrorHandling:
     @pytest.mark.asyncio
     async def test_read_handles_network_error(self) -> None:
         """Test that read handles network errors."""
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -431,7 +453,9 @@ class TestModuleInfoErrorHandling:
     @pytest.mark.asyncio
     async def test_read_wraps_exception_with_context(self) -> None:
         """Test that exceptions from API are properly raised."""
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -457,7 +481,7 @@ class TestModuleInfoEdgeCases:
     async def test_read_with_null_registry_defaults_to_terraform(self, sample_module_response: dict[str, Any]) -> None:
         """Test that None/null registry value defaults to terraform."""
         # Explicitly set registry to None
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry=None)
+        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry=None)
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -483,7 +507,7 @@ class TestModuleInfoEdgeCases:
         response_with_extras: dict[str, Any] = {
             "namespace": "terraform-aws-modules",
             "name": "vpc",
-            "provider": "aws",
+            "target_provider": "aws",
             "version": "6.5.0",
             "description": "VPC module",
             "source": "https://github.com/terraform-aws-modules/terraform-aws-vpc",
@@ -497,7 +521,9 @@ class TestModuleInfoEdgeCases:
             "nested": {"should": "be_ignored"},
         }
 
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
         ctx = ResourceContext(config=config, state=None)
 
         mock_registry = AsyncMock()
@@ -525,8 +551,8 @@ class TestModuleInfoEdgeCases:
         assert hasattr(ModuleInfoState, "__attrs_attrs__")
 
         # Both should be frozen (immutable)
-        config = ModuleInfoConfig(namespace="test", name="test", provider="aws")
-        state = ModuleInfoState(namespace="test", name="test", provider="aws")
+        config = ModuleInfoConfig(namespace="test", name="test", target_provider="aws")
+        state = ModuleInfoState(namespace="test", name="test", target_provider="aws")
 
         with pytest.raises(FrozenInstanceError):
             config.namespace = "new"
@@ -537,7 +563,9 @@ class TestModuleInfoEdgeCases:
     @pytest.mark.asyncio
     async def test_read_queries_latest_version(self, sample_module_response: dict[str, Any]) -> None:
         """Test that read queries for latest version when multiple exist."""
-        config = ModuleInfoConfig(namespace="terraform-aws-modules", name="vpc", provider="aws", registry="terraform")
+        config = ModuleInfoConfig(
+            namespace="terraform-aws-modules", name="vpc", target_provider="aws", registry="terraform"
+        )
         ctx = ResourceContext(config=config, state=None)
 
         # Mock multiple versions, first should be the latest
