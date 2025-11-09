@@ -41,15 +41,6 @@ output "sample_resource_breakdown" {
   }
 }
 
-output "current_state_info" {
-  description = "Information about this example's own state file"
-  value = {
-    version   = try(data.tofusoup_state_info.current.version, null)
-    resources = try(data.tofusoup_state_info.current.resources_count, null)
-    outputs   = try(data.tofusoup_state_info.current.outputs_count, null)
-  }
-}
-
 output "state_health_check" {
   description = "Basic health check of the sample state"
   value = {
