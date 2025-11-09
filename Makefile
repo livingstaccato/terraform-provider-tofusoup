@@ -91,16 +91,15 @@ plating: venv
 	@. $(VENV)/bin/activate && \
 		plating plate
 
-docs-setup:
+docs-setup: venv
 	@echo "Extracting theme assets from provide-foundry..."
-	@python3 -c "from provide.foundry.config import extract_base_mkdocs; from pathlib import Path; extract_base_mkdocs(Path('.'))"
+	@. $(VENV)/bin/activate && python -c "from provide.foundry.config import extract_base_mkdocs; from pathlib import Path; extract_base_mkdocs(Path('.'))"
 
 docs-build: docs-setup plating
 	@echo "Building documentation with MkDocs..."
-	@mkdocs build
+	@. $(VENV)/bin/activate && mkdocs build
 
 docs: docs-build
-	@echo "Documentation built successfully"
 
 docs-serve: docs-setup docs
 	@echo "Serving documentation at http://localhost:8000"
