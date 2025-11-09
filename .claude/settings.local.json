@@ -33,7 +33,11 @@
       "Bash(xargs cat:*)",
       "Bash(curl:*)",
       "Bash(make install:*)",
-      "Bash(PYTHONPATH=src pytest:*)"
+      "Bash(PYTHONPATH=src pytest:*)",
+      "Bash(HANDOFF-PARTS-01-12.md)",
+      "Bash(HANDOFF-PART-06.md)",
+      "Bash(HANDOFF-PART-07.md)",
+      "Bash(HANDOFF-PART-08.md)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
