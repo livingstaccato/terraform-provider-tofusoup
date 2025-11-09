@@ -42,7 +42,8 @@
       "Bash(terraform output:*)",
       "Bash(/dev/null)",
       "Bash(echo \"\n=== RESEARCH FILES CREATED ===\")",
-      "Bash(export PYTHONPATH=src:*)"
+      "Bash(export PYTHONPATH=src:*)",
+      "WebSearch"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
