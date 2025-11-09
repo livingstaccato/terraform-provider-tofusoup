@@ -43,7 +43,9 @@
       "Bash(/dev/null)",
       "Bash(echo \"\n=== RESEARCH FILES CREATED ===\")",
       "Bash(export PYTHONPATH=src:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(terraform -chdir=examples/data-sources/tofusoup_state_outputs apply:*)",
+      "Bash(terraform -chdir=/Users/tim/code/gh/provide-io/terraform-provider-tofusoup/examples/data-sources/tofusoup_state_outputs apply:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
