@@ -46,7 +46,8 @@
       "WebSearch",
       "Bash(terraform -chdir=examples/data-sources/tofusoup_state_outputs apply:*)",
       "Bash(terraform -chdir=/Users/tim/code/gh/provide-io/terraform-provider-tofusoup/examples/data-sources/tofusoup_state_outputs apply:*)",
-      "Bash(make docs:*)"
+      "Bash(make docs:*)",
+      "Bash(pyvider --help:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
