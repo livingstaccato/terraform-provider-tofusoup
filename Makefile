@@ -173,10 +173,6 @@ clean-all: clean clean-docs clean-examples clean-workenv ## Deep clean including
 docs-setup: venv ## Extract theme assets from provide-foundry
 	$(call print,$(BLUE)📦 Extracting theme assets from provide-foundry...$(NC))
 	@. $(VENV)/bin/activate && python -c "from provide.foundry.config import extract_base_mkdocs; from pathlib import Path; extract_base_mkdocs(Path('.'))"
-	@if [ ! -L docs/.provide ]; then \
-		printf '%b\n' "$(BLUE)🔗 Creating symlink to .provide in docs/...$(NC)"; \
-		ln -sf ../.provide docs/.provide 2>/dev/null || true; \
-	fi
 	$(call print,$(GREEN)✅ Theme assets ready$(NC))
 
 .PHONY: plating
