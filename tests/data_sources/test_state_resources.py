@@ -309,7 +309,7 @@ class TestStateResourcesRead:
         state = await ds.read(ctx)
 
         # At least one resource should have an ID (from sample data)
-        ids = [r["id"] for r in state.resources if r["id"] is not None]  # type: ignore
+        [r["id"] for r in state.resources if r["id"] is not None]  # type: ignore
         # We can't guarantee IDs in test data, but structure should be there
         for resource in state.resources:  # type: ignore
             assert "id" in resource
