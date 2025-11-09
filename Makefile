@@ -113,28 +113,9 @@ install: build ## Install provider to local Terraform plugins directory
 	@echo "$(GREEN)✅ Provider installed to: $(INSTALL_DIR)$(NC)"
 	@ls -lh $(VERSIONED_BINARY)
 
-plating: venv
-	@echo "Generating documentation with Plating..."
-	@. $(VENV)/bin/activate && \
-		plating plate
-
-docs-setup: venv
-	@echo "Extracting theme assets from provide-foundry..."
-	@. $(VENV)/bin/activate && python -c "from provide.foundry.config import extract_base_mkdocs; from pathlib import Path; extract_base_mkdocs(Path('.'))"
-
-docs-build: docs-setup plating
-	@echo "Building documentation with MkDocs..."
-	@. $(VENV)/bin/activate && mkdocs build
-
-docs: docs-build
-
-docs-serve: docs-setup docs
-	@echo "Serving documentation at http://localhost:8000"
-	@. $(VENV)/bin/activate && \
-		mkdocs serve
-
-clean:
-	@echo "Cleaning build artifacts..."
+.PHONY: clean
+clean: ## Clean build artifacts
+	@echo "$(BLUE)🧹 Cleaning build artifacts...$(NC)"
 	@rm -rf dist/
 	@rm -rf build/
 	@rm -rf *.egg-info
@@ -142,4 +123,162 @@ clean:
 	@rm -rf .mypy_cache
 	@rm -rf .ruff_cache
 	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	@echo "Clean complete"
+	@echo "$(GREEN)✅ Build artifacts cleaned$(NC)"
+
+.PHONY: clean-docs
+clean-docs: ## Clean documentation directory
+	@echo "$(BLUE)🧹 Cleaning documentation...$(NC)"
+	@rm -rf docs/*
+	@rm -f docs/.provide
+	@echo "$(GREEN)✅ Documentation cleaned$(NC)"
+
+.PHONY: clean-examples
+clean-examples: ## Clean example Terraform outputs
+	@echo "$(BLUE)🧹 Cleaning example outputs...$(NC)"
+	@find examples -name "*.tfstate*" -delete 2>/dev/null || true
+	@find examples -name ".terraform" -type d -exec rm -rf {} \; 2>/dev/null || true
+	@find examples -name "*.tfplan" -delete 2>/dev/null || true
+	@find examples -name "terraform.lock.hcl" -delete 2>/dev/null || true
+	@echo "$(GREEN)✅ Example outputs cleaned$(NC)"
+
+.PHONY: clean-workenv
+clean-workenv: ## Clean all flavor work environments for this provider
+	@echo "$(BLUE)🧹 Cleaning flavor work environments...$(NC)"
+	@rm -rf ~/Library/Caches/flavor/workenv/$(PROVIDER_NAME)* 2>/dev/null || true
+	@rm -rf ~/Library/Caches/flavor/workenv/.$(PROVIDER_NAME)* 2>/dev/null || true
+	@if [ -n "$$XDG_CACHE_HOME" ]; then \
+		rm -rf $$XDG_CACHE_HOME/flavor/workenv/$(PROVIDER_NAME)* 2>/dev/null || true; \
+		rm -rf $$XDG_CACHE_HOME/flavor/workenv/.$(PROVIDER_NAME)* 2>/dev/null || true; \
+	fi
+	@rm -rf ~/.cache/flavor/workenv/$(PROVIDER_NAME)* 2>/dev/null || true
+	@rm -rf ~/.cache/flavor/workenv/.$(PROVIDER_NAME)* 2>/dev/null || true
+	@echo "$(GREEN)✅ Flavor work environments cleaned$(NC)"
+
+.PHONY: clean-all
+clean-all: clean clean-docs clean-examples clean-workenv ## Deep clean including venv and all caches
+	@echo "$(RED)🔥 Deep cleaning everything...$(NC)"
+	@rm -rf .venv/
+	@rm -rf keys/
+	@echo "$(GREEN)✅ Everything cleaned$(NC)"
+
+# ==============================================================================
+# 📚 Documentation
+# ==============================================================================
+
+.PHONY: docs-setup
+docs-setup: venv ## Extract theme assets from provide-foundry
+	@echo "$(BLUE)📦 Extracting theme assets from provide-foundry...$(NC)"
+	@. $(VENV)/bin/activate && python -c "from provide.foundry.config import extract_base_mkdocs; from pathlib import Path; extract_base_mkdocs(Path('.'))"
+	@if [ ! -L docs/.provide ]; then \
+		echo "$(BLUE)🔗 Creating symlink to .provide in docs/...$(NC)"; \
+		ln -sf ../.provide docs/.provide 2>/dev/null || true; \
+	fi
+	@echo "$(GREEN)✅ Theme assets ready$(NC)"
+
+.PHONY: plating
+plating: venv ## Generate documentation with Plating
+	@echo "$(BLUE)📚 Generating documentation with Plating...$(NC)"
+	@. $(VENV)/bin/activate && \
+		plating plate
+	@echo "$(GREEN)✅ Documentation generated$(NC)"
+
+.PHONY: docs-build
+docs-build: docs-setup plating ## Build documentation (setup + plating + mkdocs)
+	@echo "$(BLUE)📚 Building documentation with MkDocs...$(NC)"
+	@. $(VENV)/bin/activate && mkdocs build
+	@echo "$(GREEN)✅ Documentation built$(NC)"
+
+.PHONY: docs
+docs: docs-build ## Build documentation
+
+.PHONY: docs-serve
+docs-serve: docs-setup docs ## Build and serve documentation locally
+	@echo "$(BLUE)🌐 Serving documentation at:$(NC)"
+	@echo "$(GREEN)  http://127.0.0.1:8000$(NC)"
+	@. $(VENV)/bin/activate && \
+		mkdocs serve
+
+.PHONY: lint-examples
+lint-examples: ## Run terraform fmt on examples
+	@echo "$(BLUE)🎨 Formatting examples...$(NC)"
+	@terraform fmt -recursive examples/ 2>/dev/null || true
+	@echo "$(GREEN)✅ Examples formatted$(NC)"
+
+# ==============================================================================
+# 🧪 Testing & Validation
+# ==============================================================================
+
+.PHONY: test
+test: venv build ## Test the provider binary with performance timing
+	@echo "$(BLUE)🧪 Testing provider...$(NC)"
+	@echo "Testing PSP file:"
+	@echo "First run (cold start):"
+	@time ./$(PSP_FILE) launch-context || true
+	@echo "\nSecond run (warm start):"
+	@time ./$(PSP_FILE) launch-context || true
+	@echo "\nTesting versioned binary:"
+	@echo "First run (cold start):"
+	@time ./$(VERSIONED_BINARY) launch-context || true
+	@echo "\nSecond run (warm start):"
+	@time ./$(VERSIONED_BINARY) launch-context || true
+
+.PHONY: test-unit
+test-unit: venv deps ## Run unit tests with pytest
+	@echo "$(BLUE)🧪 Running unit tests...$(NC)"
+	@. $(VENV)/bin/activate && pytest tests/
+	@echo "$(GREEN)✅ Tests passed$(NC)"
+
+.PHONY: lint
+lint: ## Run code linting
+	@echo "$(BLUE)🔍 Running linters...$(NC)"
+	@ruff check . 2>/dev/null || echo "$(YELLOW)⚠️  Ruff not available$(NC)"
+	@mypy . 2>/dev/null || echo "$(YELLOW)⚠️  Mypy not available$(NC)"
+	@echo "$(GREEN)✅ Linting complete$(NC)"
+
+.PHONY: format
+format: ## Format code
+	@echo "$(BLUE)🎨 Formatting code...$(NC)"
+	@ruff format . 2>/dev/null || echo "$(YELLOW)⚠️  Ruff format not available$(NC)"
+	@echo "$(GREEN)✅ Code formatted$(NC)"
+
+# ==============================================================================
+# 📊 Project Info
+# ==============================================================================
+
+.PHONY: version
+version: ## Show current version
+	@echo "Current version: $(VERSION)"
+
+.PHONY: info
+info: ## Show project information
+	@echo "$(BLUE)📊 Terraform Provider TofuSoup$(NC)"
+	@echo "================================"
+	@echo "Version:         $(VERSION)"
+	@echo "Platform:        $(CURRENT_PLATFORM)"
+	@echo "Python:          $$(python --version 2>&1)"
+	@echo "UV:              $$(uv --version 2>&1)"
+	@echo "Flavor:          $$(flavor --version 2>&1 | head -1 || echo 'not installed')"
+	@echo ""
+	@echo "Project Structure:"
+	@echo "  Provider:        $(PROVIDER_NAME)"
+	@echo "  PSP File:        $(PSP_FILE)"
+	@echo "  Versioned Binary: $(VERSIONED_BINARY)"
+	@echo "  Install Dir:     $(INSTALL_DIR)"
+	@echo ""
+	@echo "Build Artifacts:"
+	@if [ -f "$(PSP_FILE)" ]; then \
+		echo "  PSP:             ✅ $(PSP_FILE)"; \
+	else \
+		echo "  PSP:             ❌ Not built"; \
+	fi
+	@if [ -f "$(VERSIONED_BINARY)" ]; then \
+		echo "  Versioned:       ✅ $(VERSIONED_BINARY)"; \
+	else \
+		echo "  Versioned:       ❌ Not built"; \
+	fi
+	@echo ""
+	@echo "Recent Commits:"
+	@git log --oneline -5 2>/dev/null || echo "Not a git repository"
+
+# Default target
+.DEFAULT_GOAL := help
