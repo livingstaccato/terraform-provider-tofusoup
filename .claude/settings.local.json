@@ -25,7 +25,9 @@
       "Bash(done)",
       "Bash(pyvider components diagnostics:*)",
       "Bash(uv pip list:*)",
-      "Bash(plating plate)"
+      "Bash(plating plate)",
+      "Bash(terraform init:*)",
+      "Bash(terraform apply:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
