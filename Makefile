@@ -1,12 +1,18 @@
-# Terraform Provider TofuSoup - Makefile
+# Pyvider Provider Makefile Helper
 #
 # NOTE: This Makefile follows terraform-provider-pyvider as the reference implementation.
 # TODO: Establish formal Makefile template system in provide-foundry for consistency across all provider projects.
 
+# Configuration - Auto-discovered from pyproject.toml
+PROVIDER_NAME := $(shell grep '^name = ' pyproject.toml | cut -d'"' -f2)
+VERSION := $(shell grep '^version = ' pyproject.toml | cut -d'"' -f2)
+PROVIDER_SHORT_NAME := $(shell echo $(PROVIDER_NAME) | sed 's/terraform-provider-//')
+SHELL := /bin/bash
+
 .PHONY: help
 help: ## Show this help message
-	@echo "Terraform Provider TofuSoup - Development Commands"
-	@echo "=================================================="
+	@echo "Pyvider Provider: $(PROVIDER_SHORT_NAME) - Development Commands"
+	@echo "================================================================"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 	@echo ""
@@ -15,11 +21,6 @@ help: ## Show this help message
 	@echo "  make build          # Build the provider"
 	@echo "  make test           # Run tests"
 	@echo "  make docs           # Build documentation"
-
-# Configuration
-PROVIDER_NAME := terraform-provider-tofusoup
-VERSION ?= 0.0.1108
-SHELL := /bin/bash
 
 # Platform detection
 UNAME_S := $(shell uname -s | tr '[:upper:]' '[:lower:]')
@@ -39,16 +40,19 @@ CURRENT_PLATFORM := $(UNAME_S)_$(ARCH)
 
 # Paths
 VENV := .venv
-INSTALL_DIR := $(HOME)/.terraform.d/plugins/local/providers/tofusoup/$(VERSION)/$(CURRENT_PLATFORM)
+INSTALL_DIR := $(HOME)/.terraform.d/plugins/local/providers/$(PROVIDER_SHORT_NAME)/$(VERSION)/$(CURRENT_PLATFORM)
 PSP_FILE := dist/$(PROVIDER_NAME).psp
 VERSIONED_BINARY := $(INSTALL_DIR)/$(PROVIDER_NAME)
 
-# Colors for output
+# Colors for output (use with $(call print,...))
 BLUE := \033[0;34m
 GREEN := \033[0;32m
 YELLOW := \033[0;33m
 RED := \033[0;31m
 NC := \033[0m # No Color
+
+# Helper for colored output
+print = @printf '%b\n' "$(1)"
 
 # ==============================================================================
 # 🚀 Quick Commands
@@ -67,18 +71,18 @@ dev: venv deps build install ## Quick development setup and build
 .PHONY: venv
 venv: ## Create virtual environment
 	@if [ ! -d "$(VENV)" ]; then \
-		echo "$(BLUE)🔧 Creating virtual environment...$(NC)"; \
+		printf '%b\n' "$(BLUE)🔧 Creating virtual environment...$(NC)"; \
 		uv venv $(VENV); \
-		echo "$(GREEN)✅ Virtual environment created$(NC)"; \
+		printf '%b\n' "$(GREEN)✅ Virtual environment created$(NC)"; \
 	else \
-		echo "$(GREEN)✅ Virtual environment already exists$(NC)"; \
+		printf '%b\n' "$(GREEN)✅ Virtual environment already exists$(NC)"; \
 	fi
 
 .PHONY: deps
 deps: venv ## Install dependencies with uv
-	@echo "$(BLUE)📦 Installing dependencies...$(NC)"
+	$(call print,$(BLUE)📦 Installing dependencies...$(NC))
 	@. $(VENV)/bin/activate && uv sync --all-groups
-	@echo "$(GREEN)✅ Dependencies installed$(NC)"
+	$(call print,$(GREEN)✅ Dependencies installed$(NC))
 
 # ==============================================================================
 # 🏗️ Build & Package
@@ -87,35 +91,35 @@ deps: venv ## Install dependencies with uv
 .PHONY: keys
 keys: ## Generate signing keys if missing
 	@if [ ! -f keys/provider-private.key ]; then \
-		echo "$(BLUE)🔑 Generating signing keys...$(NC)"; \
+		printf '%b\n' "$(BLUE)🔑 Generating signing keys...$(NC)"; \
 		mkdir -p keys; \
 		. $(VENV)/bin/activate && \
 		flavor keygen --out-dir keys; \
-		echo "$(GREEN)✅ Keys generated$(NC)"; \
+		printf '%b\n' "$(GREEN)✅ Keys generated$(NC)"; \
 	else \
-		echo "$(GREEN)✅ Signing keys already exist$(NC)"; \
+		printf '%b\n' "$(GREEN)✅ Signing keys already exist$(NC)"; \
 	fi
 
 .PHONY: build
 build: venv deps keys ## Build provider binary with FlavorPack
-	@echo "$(BLUE)🏗️ Building provider version $(VERSION) for $(CURRENT_PLATFORM)...$(NC)"
+	$(call print,$(BLUE)🏗️ Building provider version $(VERSION) for $(CURRENT_PLATFORM)...$(NC))
 	@. $(VENV)/bin/activate && \
 		flavor pack && \
-		echo "$(GREEN)✅ Provider built: $(PSP_FILE)$(NC)" && \
+		printf '%b\n' "$(GREEN)✅ Provider built: $(PSP_FILE)$(NC)" && \
 		mkdir -p $(INSTALL_DIR) && \
 		cp $(PSP_FILE) $(VERSIONED_BINARY) && \
 		chmod +x $(VERSIONED_BINARY) && \
-		echo "$(GREEN)✅ Versioned binary created: $(VERSIONED_BINARY)$(NC)" && \
+		printf '%b\n' "$(GREEN)✅ Versioned binary created: $(VERSIONED_BINARY)$(NC)" && \
 		ls -lh $(PSP_FILE) $(VERSIONED_BINARY)
 
 .PHONY: install
 install: build ## Install provider to local Terraform plugins directory
-	@echo "$(GREEN)✅ Provider installed to: $(INSTALL_DIR)$(NC)"
+	$(call print,$(GREEN)✅ Provider installed to: $(INSTALL_DIR)$(NC))
 	@ls -lh $(VERSIONED_BINARY)
 
 .PHONY: clean
 clean: ## Clean build artifacts
-	@echo "$(BLUE)🧹 Cleaning build artifacts...$(NC)"
+	$(call print,$(BLUE)🧹 Cleaning build artifacts...$(NC))
 	@rm -rf dist/
 	@rm -rf build/
 	@rm -rf *.egg-info
@@ -123,27 +127,27 @@ clean: ## Clean build artifacts
 	@rm -rf .mypy_cache
 	@rm -rf .ruff_cache
 	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	@echo "$(GREEN)✅ Build artifacts cleaned$(NC)"
+	$(call print,$(GREEN)✅ Build artifacts cleaned$(NC))
 
 .PHONY: clean-docs
 clean-docs: ## Clean documentation directory
-	@echo "$(BLUE)🧹 Cleaning documentation...$(NC)"
+	$(call print,$(BLUE)🧹 Cleaning documentation...$(NC))
 	@rm -rf docs/*
 	@rm -f docs/.provide
-	@echo "$(GREEN)✅ Documentation cleaned$(NC)"
+	$(call print,$(GREEN)✅ Documentation cleaned$(NC))
 
 .PHONY: clean-examples
 clean-examples: ## Clean example Terraform outputs
-	@echo "$(BLUE)🧹 Cleaning example outputs...$(NC)"
+	$(call print,$(BLUE)🧹 Cleaning example outputs...$(NC))
 	@find examples -name "*.tfstate*" -delete 2>/dev/null || true
 	@find examples -name ".terraform" -type d -exec rm -rf {} \; 2>/dev/null || true
 	@find examples -name "*.tfplan" -delete 2>/dev/null || true
 	@find examples -name "terraform.lock.hcl" -delete 2>/dev/null || true
-	@echo "$(GREEN)✅ Example outputs cleaned$(NC)"
+	$(call print,$(GREEN)✅ Example outputs cleaned$(NC))
 
 .PHONY: clean-workenv
 clean-workenv: ## Clean all flavor work environments for this provider
-	@echo "$(BLUE)🧹 Cleaning flavor work environments...$(NC)"
+	$(call print,$(BLUE)🧹 Cleaning flavor work environments...$(NC))
 	@rm -rf ~/Library/Caches/flavor/workenv/$(PROVIDER_NAME)* 2>/dev/null || true
 	@rm -rf ~/Library/Caches/flavor/workenv/.$(PROVIDER_NAME)* 2>/dev/null || true
 	@if [ -n "$$XDG_CACHE_HOME" ]; then \
@@ -152,14 +156,14 @@ clean-workenv: ## Clean all flavor work environments for this provider
 	fi
 	@rm -rf ~/.cache/flavor/workenv/$(PROVIDER_NAME)* 2>/dev/null || true
 	@rm -rf ~/.cache/flavor/workenv/.$(PROVIDER_NAME)* 2>/dev/null || true
-	@echo "$(GREEN)✅ Flavor work environments cleaned$(NC)"
+	$(call print,$(GREEN)✅ Flavor work environments cleaned$(NC))
 
 .PHONY: clean-all
 clean-all: clean clean-docs clean-examples clean-workenv ## Deep clean including venv and all caches
-	@echo "$(RED)🔥 Deep cleaning everything...$(NC)"
+	$(call print,$(RED)🔥 Deep cleaning everything...$(NC))
 	@rm -rf .venv/
 	@rm -rf keys/
-	@echo "$(GREEN)✅ Everything cleaned$(NC)"
+	$(call print,$(GREEN)✅ Everything cleaned$(NC))
 
 # ==============================================================================
 # 📚 Documentation
@@ -167,42 +171,42 @@ clean-all: clean clean-docs clean-examples clean-workenv ## Deep clean including
 
 .PHONY: docs-setup
 docs-setup: venv ## Extract theme assets from provide-foundry
-	@echo "$(BLUE)📦 Extracting theme assets from provide-foundry...$(NC)"
+	$(call print,$(BLUE)📦 Extracting theme assets from provide-foundry...$(NC))
 	@. $(VENV)/bin/activate && python -c "from provide.foundry.config import extract_base_mkdocs; from pathlib import Path; extract_base_mkdocs(Path('.'))"
 	@if [ ! -L docs/.provide ]; then \
-		echo "$(BLUE)🔗 Creating symlink to .provide in docs/...$(NC)"; \
+		printf '%b\n' "$(BLUE)🔗 Creating symlink to .provide in docs/...$(NC)"; \
 		ln -sf ../.provide docs/.provide 2>/dev/null || true; \
 	fi
-	@echo "$(GREEN)✅ Theme assets ready$(NC)"
+	$(call print,$(GREEN)✅ Theme assets ready$(NC))
 
 .PHONY: plating
 plating: venv ## Generate documentation with Plating
-	@echo "$(BLUE)📚 Generating documentation with Plating...$(NC)"
+	$(call print,$(BLUE)📚 Generating documentation with Plating...$(NC))
 	@. $(VENV)/bin/activate && \
 		plating plate
-	@echo "$(GREEN)✅ Documentation generated$(NC)"
+	$(call print,$(GREEN)✅ Documentation generated$(NC))
 
 .PHONY: docs-build
 docs-build: docs-setup plating ## Build documentation (setup + plating + mkdocs)
-	@echo "$(BLUE)📚 Building documentation with MkDocs...$(NC)"
+	$(call print,$(BLUE)📚 Building documentation with MkDocs...$(NC))
 	@. $(VENV)/bin/activate && mkdocs build
-	@echo "$(GREEN)✅ Documentation built$(NC)"
+	$(call print,$(GREEN)✅ Documentation built$(NC))
 
 .PHONY: docs
 docs: docs-build ## Build documentation
 
 .PHONY: docs-serve
 docs-serve: docs-setup docs ## Build and serve documentation locally
-	@echo "$(BLUE)🌐 Serving documentation at:$(NC)"
-	@echo "$(GREEN)  http://127.0.0.1:8000$(NC)"
+	$(call print,$(BLUE)🌐 Serving documentation at:$(NC))
+	$(call print,$(GREEN)  http://127.0.0.1:8000$(NC))
 	@. $(VENV)/bin/activate && \
 		mkdocs serve
 
 .PHONY: lint-examples
 lint-examples: ## Run terraform fmt on examples
-	@echo "$(BLUE)🎨 Formatting examples...$(NC)"
+	$(call print,$(BLUE)🎨 Formatting examples...$(NC))
 	@terraform fmt -recursive examples/ 2>/dev/null || true
-	@echo "$(GREEN)✅ Examples formatted$(NC)"
+	$(call print,$(GREEN)✅ Examples formatted$(NC))
 
 # ==============================================================================
 # 🧪 Testing & Validation
@@ -210,7 +214,7 @@ lint-examples: ## Run terraform fmt on examples
 
 .PHONY: test
 test: venv build ## Test the provider binary with performance timing
-	@echo "$(BLUE)🧪 Testing provider...$(NC)"
+	$(call print,$(BLUE)🧪 Testing provider...$(NC))
 	@echo "Testing PSP file:"
 	@echo "First run (cold start):"
 	@time ./$(PSP_FILE) launch-context || true
@@ -224,22 +228,22 @@ test: venv build ## Test the provider binary with performance timing
 
 .PHONY: test-unit
 test-unit: venv deps ## Run unit tests with pytest
-	@echo "$(BLUE)🧪 Running unit tests...$(NC)"
+	$(call print,$(BLUE)🧪 Running unit tests...$(NC))
 	@. $(VENV)/bin/activate && pytest tests/
-	@echo "$(GREEN)✅ Tests passed$(NC)"
+	$(call print,$(GREEN)✅ Tests passed$(NC))
 
 .PHONY: lint
 lint: ## Run code linting
-	@echo "$(BLUE)🔍 Running linters...$(NC)"
-	@ruff check . 2>/dev/null || echo "$(YELLOW)⚠️  Ruff not available$(NC)"
-	@mypy . 2>/dev/null || echo "$(YELLOW)⚠️  Mypy not available$(NC)"
-	@echo "$(GREEN)✅ Linting complete$(NC)"
+	$(call print,$(BLUE)🔍 Running linters...$(NC))
+	@ruff check . 2>/dev/null || printf '%b\n' "$(YELLOW)⚠️  Ruff not available$(NC)"
+	@mypy . 2>/dev/null || printf '%b\n' "$(YELLOW)⚠️  Mypy not available$(NC)"
+	$(call print,$(GREEN)✅ Linting complete$(NC))
 
 .PHONY: format
 format: ## Format code
-	@echo "$(BLUE)🎨 Formatting code...$(NC)"
-	@ruff format . 2>/dev/null || echo "$(YELLOW)⚠️  Ruff format not available$(NC)"
-	@echo "$(GREEN)✅ Code formatted$(NC)"
+	$(call print,$(BLUE)🎨 Formatting code...$(NC))
+	@ruff format . 2>/dev/null || printf '%b\n' "$(YELLOW)⚠️  Ruff format not available$(NC)"
+	$(call print,$(GREEN)✅ Code formatted$(NC))
 
 # ==============================================================================
 # 📊 Project Info
@@ -251,8 +255,10 @@ version: ## Show current version
 
 .PHONY: info
 info: ## Show project information
-	@echo "$(BLUE)📊 Terraform Provider TofuSoup$(NC)"
-	@echo "================================"
+	$(call print,$(BLUE)📊 Pyvider Provider: $(PROVIDER_SHORT_NAME)$(NC))
+	@echo "========================================"
+	@echo "Provider Name:   $(PROVIDER_NAME)"
+	@echo "Short Name:      $(PROVIDER_SHORT_NAME)"
 	@echo "Version:         $(VERSION)"
 	@echo "Platform:        $(CURRENT_PLATFORM)"
 	@echo "Python:          $$(python --version 2>&1)"
