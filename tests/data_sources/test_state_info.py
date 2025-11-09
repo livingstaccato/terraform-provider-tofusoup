@@ -1,7 +1,6 @@
 """Tests for the state_info data source."""
 
 import json
-from pathlib import Path
 
 import pytest
 from pyvider.resources.context import ResourceContext
@@ -458,7 +457,7 @@ class TestStateInfoEdgeCases:
         resources = [
             {
                 "mode": "managed",
-                "type": f"aws_instance",
+                "type": "aws_instance",
                 "name": f"instance_{i}",
                 "provider": 'provider["registry.terraform.io/hashicorp/aws"]',
             }
