@@ -244,8 +244,9 @@ def sample_state_with_resources(tmp_path):
                 "serial": 3,
                 "lineage": "test-lineage-resources",
                 "outputs": {
-                    "example_output": {"value": "example_value", "type": "string"},
-                    "another_output": {"value": 42, "type": "number"},
+                    "vpc_id": {"value": "vpc-0123456789abcdef0", "type": "string", "sensitive": False},
+                    "instance_ids": {"value": ["i-001", "i-002"], "type": ["list", "string"], "sensitive": False},
+                    "database_endpoint": {"value": "mydb.us-east-1.rds.amazonaws.com", "type": "string", "sensitive": False},
                 },
                 "resources": [
                     {
