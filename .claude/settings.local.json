@@ -50,7 +50,8 @@
       "Bash(pyvider --help:*)",
       "Bash(xargs:*)",
       "Bash(terraform plan:*)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(. .venv/bin/activate)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
