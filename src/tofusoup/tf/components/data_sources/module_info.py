@@ -9,22 +9,17 @@ from __future__ import annotations
 from typing import Any, cast
 
 from attrs import define
-from pyvider.resource import DataSource, ResourceContext
-from pyvider.schema import (
-    a_bool,
-    a_num,
-    a_str,
-    s_data_source,
-)
-from pyvider.types import DataSourceSchema
-
-from tofusoup.registry.clients.opentofu import OpenTofuRegistry
-from tofusoup.registry.clients.terraform import IBMTerraformRegistry
-from tofusoup.registry.config import RegistryConfig
-
-# Registry URLs
-TERRAFORM_REGISTRY_URL = "https://registry.terraform.io"
-OPENTOFU_REGISTRY_URL = "https://registry.opentofu.org"
+from provide.foundation import logger  # type: ignore
+from provide.foundation.errors import resilient  # type: ignore
+from pyvider.data_sources.base import BaseDataSource  # type: ignore
+from pyvider.data_sources.decorators import register_data_source  # type: ignore
+from pyvider.exceptions import DataSourceError  # type: ignore
+from pyvider.resources.context import ResourceContext  # type: ignore
+from pyvider.schema import PvsSchema, a_bool, a_num, a_str, s_data_source  # type: ignore
+from tofusoup.config.defaults import OPENTOFU_REGISTRY_URL, TERRAFORM_REGISTRY_URL  # type: ignore
+from tofusoup.registry.base import RegistryConfig  # type: ignore
+from tofusoup.registry.opentofu import OpenTofuRegistry  # type: ignore
+from tofusoup.registry.terraform import IBMTerraformRegistry  # type: ignore
 
 
 @define(frozen=True)
@@ -75,11 +70,8 @@ class ModuleInfoState:
     owner: str | None = None
 
 
-# Type alias for the schema
-MiSchema = DataSourceSchema[ModuleInfoConfig, ModuleInfoState]
-
-
-class ModuleInfoDataSource(DataSource[ModuleInfoConfig, ModuleInfoState]):
+@register_data_source("tofusoup_module_info")
+class ModuleInfoDataSource(BaseDataSource[str, ModuleInfoState, ModuleInfoConfig]):  # type: ignore[misc]
     """Data source for querying module information from Terraform or OpenTofu registry.
 
     ## Example Usage
@@ -130,8 +122,21 @@ class ModuleInfoDataSource(DataSource[ModuleInfoConfig, ModuleInfoState]):
     - `owner` - Module owner/maintainer username
     """
 
+    async def _validate_config(self, config: ModuleInfoConfig) -> list[str]:
+        """Validate the configuration. Returns list of error strings, or empty list if valid."""
+        errors = []
+        if not config.namespace:
+            errors.append("'namespace' is required and cannot be empty.")
+        if not config.name:
+            errors.append("'name' is required and cannot be empty.")
+        if not config.provider:
+            errors.append("'provider' is required and cannot be empty.")
+        if config.registry and config.registry not in ["terraform", "opentofu"]:
+            errors.append("'registry' must be either 'terraform' or 'opentofu'.")
+        return errors
+
     @classmethod
-    def get_schema(cls) -> MiSchema:
+    def get_schema(cls) -> PvsSchema:
         """Return the schema for module_info data source.
 
         Returns:
@@ -189,6 +194,7 @@ class ModuleInfoDataSource(DataSource[ModuleInfoConfig, ModuleInfoState]):
             }
         )
 
+    @resilient()
     async def read(self, ctx: ResourceContext) -> ModuleInfoState:
         """Read module information from the registry.
 
@@ -199,58 +205,93 @@ class ModuleInfoDataSource(DataSource[ModuleInfoConfig, ModuleInfoState]):
             State with module information.
 
         Raises:
-            Exception: If module not found or registry API error.
+            DataSourceError: If module not found or registry API error.
         """
+        if not ctx.config:
+            raise DataSourceError("Configuration is required.")
+
         config = cast(ModuleInfoConfig, ctx.config)
 
-        # Construct module identifier for version query
-        module_id = f"{config.namespace}/{config.name}/{config.provider}"
-
-        # Determine which registry to use
-        if config.registry == "opentofu":
-            registry_config = RegistryConfig(base_url=OPENTOFU_REGISTRY_URL)
-            async with OpenTofuRegistry(registry_config) as registry:
-                # Get latest version first
-                versions = await registry.list_module_versions(module_id)
-                if not versions:
-                    raise ValueError(f"No versions found for module {module_id}")
-                latest_version = versions[0].version
-
-                # Get module details for latest version
-                details = await registry.get_module_details(
-                    config.namespace,
-                    config.name,
-                    config.provider,
-                    latest_version,
-                )
-        else:
-            registry_config = RegistryConfig(base_url=TERRAFORM_REGISTRY_URL)
-            async with IBMTerraformRegistry(registry_config) as registry:
-                # Get latest version first
-                versions = await registry.list_module_versions(module_id)
-                if not versions:
-                    raise ValueError(f"No versions found for module {module_id}")
-                latest_version = versions[0].version
-
-                # Get module details for latest version
-                details = await registry.get_module_details(
-                    config.namespace,
-                    config.name,
-                    config.provider,
-                    latest_version,
-                )
-
-        # Extract fields from the API response
-        return ModuleInfoState(
+        logger.info(
+            "Querying module info",
             namespace=config.namespace,
             name=config.name,
             provider=config.provider,
-            registry=config.registry,
-            version=details.get("version"),
-            description=details.get("description"),
-            source_url=details.get("source"),
-            downloads=details.get("downloads"),
-            verified=details.get("verified"),
-            published_at=details.get("published_at"),
-            owner=details.get("owner"),
+            registry=config.registry or "terraform",
         )
+
+        try:
+            # Construct module identifier for version query
+            module_id = f"{config.namespace}/{config.name}/{config.provider}"
+
+            # Determine which registry to use
+            if config.registry == "opentofu":
+                registry_config = RegistryConfig(base_url=OPENTOFU_REGISTRY_URL)
+                async with OpenTofuRegistry(registry_config) as registry:
+                    # Get latest version first
+                    versions = await registry.list_module_versions(module_id)
+                    if not versions:
+                        raise DataSourceError(f"No versions found for module {module_id}")
+                    latest_version = versions[0].version
+
+                    # Get module details for latest version
+                    details = await registry.get_module_details(
+                        config.namespace,
+                        config.name,
+                        config.provider,
+                        latest_version,
+                    )
+            else:
+                registry_config = RegistryConfig(base_url=TERRAFORM_REGISTRY_URL)
+                async with IBMTerraformRegistry(registry_config) as registry:
+                    # Get latest version first
+                    versions = await registry.list_module_versions(module_id)
+                    if not versions:
+                        raise DataSourceError(f"No versions found for module {module_id}")
+                    latest_version = versions[0].version
+
+                    # Get module details for latest version
+                    details = await registry.get_module_details(
+                        config.namespace,
+                        config.name,
+                        config.provider,
+                        latest_version,
+                    )
+
+            # Check if module was found
+            if not details:
+                raise DataSourceError(
+                    f"Module {module_id} not found in {config.registry or 'terraform'} registry"
+                )
+
+            # Extract fields from the API response
+            return ModuleInfoState(
+                namespace=config.namespace,
+                name=config.name,
+                provider=config.provider,
+                registry=config.registry,
+                version=details.get("version"),
+                description=details.get("description"),
+                source_url=details.get("source"),
+                downloads=details.get("downloads"),
+                verified=details.get("verified"),
+                published_at=details.get("published_at"),
+                owner=details.get("owner"),
+            )
+
+        except DataSourceError:
+            # Re-raise DataSourceErrors as-is
+            raise
+        except Exception as e:
+            logger.error(
+                "Failed to query module info",
+                namespace=config.namespace,
+                name=config.name,
+                provider=config.provider,
+                registry=config.registry or "terraform",
+                error=str(e),
+            )
+            raise DataSourceError(
+                f"Failed to query module info for {module_id} "
+                f"from {config.registry or 'terraform'} registry: {str(e)}"
+            ) from e
