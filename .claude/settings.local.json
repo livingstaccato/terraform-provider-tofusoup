@@ -45,7 +45,8 @@
       "Bash(export PYTHONPATH=src:*)",
       "WebSearch",
       "Bash(terraform -chdir=examples/data-sources/tofusoup_state_outputs apply:*)",
-      "Bash(terraform -chdir=/Users/tim/code/gh/provide-io/terraform-provider-tofusoup/examples/data-sources/tofusoup_state_outputs apply:*)"
+      "Bash(terraform -chdir=/Users/tim/code/gh/provide-io/terraform-provider-tofusoup/examples/data-sources/tofusoup_state_outputs apply:*)",
+      "Bash(make docs:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
