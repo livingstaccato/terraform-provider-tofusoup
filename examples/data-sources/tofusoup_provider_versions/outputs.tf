@@ -1,7 +1,7 @@
 # AWS Provider Outputs
 output "aws_total_versions" {
   description = "Total number of AWS provider versions available"
-  value       = data.tofusoup_provider_versions.aws.count
+  value       = data.tofusoup_provider_versions.aws.version_count
 }
 
 output "aws_latest_version" {
@@ -49,7 +49,7 @@ output "aws_protocol_6_versions" {
 # Google Provider Outputs
 output "google_total_versions" {
   description = "Total number of Google provider versions available"
-  value       = data.tofusoup_provider_versions.google.count
+  value       = data.tofusoup_provider_versions.google.version_count
 }
 
 output "google_latest_version" {
@@ -60,7 +60,7 @@ output "google_latest_version" {
 # Random Provider Outputs
 output "random_total_versions" {
   description = "Total number of Random provider versions available"
-  value       = data.tofusoup_provider_versions.random.count
+  value       = data.tofusoup_provider_versions.random.version_count
 }
 
 output "random_latest_version" {
@@ -73,15 +73,15 @@ output "version_summary" {
   description = "Summary of provider versions"
   value = {
     aws = {
-      total_versions = data.tofusoup_provider_versions.aws.count
+      total_versions = data.tofusoup_provider_versions.aws.version_count
       latest_version = data.tofusoup_provider_versions.aws.versions[0].version
     }
     google = {
-      total_versions = data.tofusoup_provider_versions.google.count
+      total_versions = data.tofusoup_provider_versions.google.version_count
       latest_version = data.tofusoup_provider_versions.google.versions[0].version
     }
     random = {
-      total_versions = data.tofusoup_provider_versions.random.count
+      total_versions = data.tofusoup_provider_versions.random.version_count
       latest_version = data.tofusoup_provider_versions.random.versions[0].version
     }
   }

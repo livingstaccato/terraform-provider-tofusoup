@@ -34,7 +34,7 @@ class ProviderVersionsState:
     name: str | None = None
     registry: str | None = None
     versions: list[dict[str, Any]] | None = None
-    count: int | None = None
+    version_count: int | None = None
 
 
 @register_data_source("tofusoup_provider_versions")
@@ -67,7 +67,7 @@ class ProviderVersionsDataSource(BaseDataSource[str, ProviderVersionsState, Prov
     }
 
     output "total_versions" {
-      value = data.tofusoup_provider_versions.aws_terraform.count
+      value = data.tofusoup_provider_versions.aws_terraform.version_count
     }
 
     output "latest_version" {
@@ -95,7 +95,7 @@ class ProviderVersionsDataSource(BaseDataSource[str, ProviderVersionsState, Prov
     - `namespace` - The provider namespace (echoes input)
     - `name` - The provider name (echoes input)
     - `registry` - The registry queried (echoes input)
-    - `count` - Total number of versions available
+    - `version_count` - Total number of versions available
     - `versions` - List of version objects, each containing:
       - `version` - Version string (e.g., "6.8.0")
       - `protocols` - List of supported Terraform protocol versions (e.g., ["6"])
@@ -117,7 +117,7 @@ class ProviderVersionsDataSource(BaseDataSource[str, ProviderVersionsState, Prov
                 "namespace": a_str(required=True),
                 "name": a_str(required=True),
                 "registry": a_str(optional=True, default="terraform"),
-                "count": a_num(computed=True),
+                "version_count": a_num(computed=True),
                 "versions": a_list(
                     element_type_def=a_obj(
                         attributes={
@@ -202,7 +202,7 @@ class ProviderVersionsDataSource(BaseDataSource[str, ProviderVersionsState, Prov
                 name=config.name,
                 registry=config.registry,
                 versions=versions_data,
-                count=len(versions_data),
+                version_count=len(versions_data),
             )
 
         except Exception as e:

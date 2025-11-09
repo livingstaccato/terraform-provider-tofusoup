@@ -40,7 +40,7 @@ class TestProviderVersionsDataSource:
         assert "namespace" in schema.block.attributes
         assert "name" in schema.block.attributes
         assert "registry" in schema.block.attributes
-        assert "count" in schema.block.attributes
+        assert "version_count" in schema.block.attributes
         assert "versions" in schema.block.attributes
 
     def test_schema_has_required_attributes(self) -> None:
@@ -54,7 +54,7 @@ class TestProviderVersionsDataSource:
         assert attrs["registry"].optional is True
 
         # Computed attributes
-        assert attrs["count"].computed is True
+        assert attrs["version_count"].computed is True
         assert attrs["versions"].computed is True
 
     def test_schema_registry_has_default(self) -> None:
@@ -133,7 +133,7 @@ class TestProviderVersionsRead:
         assert state.namespace == "hashicorp"
         assert state.name == "aws"
         assert state.registry == "terraform"
-        assert state.count == 3
+        assert state.version_count == 3
         assert state.versions is not None
         assert len(state.versions) == 3
         assert state.versions[0]["version"] == "6.8.0"
@@ -158,7 +158,7 @@ class TestProviderVersionsRead:
 
         assert state.namespace == "opentofu"
         assert state.registry == "opentofu"
-        assert state.count == 3
+        assert state.version_count == 3
 
     @pytest.mark.asyncio
     async def test_read_empty_results(self, sample_config: ProviderVersionsConfig) -> None:
@@ -175,7 +175,7 @@ class TestProviderVersionsRead:
             mock_class.return_value = mock_registry
             state = await ds.read(ctx)
 
-        assert state.count == 0
+        assert state.version_count == 0
         assert state.versions == []
 
     @pytest.mark.asyncio
@@ -229,7 +229,7 @@ class TestProviderVersionsRead:
             mock_class.return_value = mock_registry
             state = await ds.read(ctx)
 
-        assert state.count == 1
+        assert state.version_count == 1
         assert len(state.versions) == 1
         assert state.versions[0]["version"] == "1.0.0"
 
@@ -389,7 +389,7 @@ class TestProviderVersionsEdgeCases:
             mock_class.return_value = mock_registry
             state = await ds.read(ctx)
 
-        assert state.count == 100
+        assert state.version_count == 100
         assert len(state.versions) == 100
 
     @pytest.mark.asyncio

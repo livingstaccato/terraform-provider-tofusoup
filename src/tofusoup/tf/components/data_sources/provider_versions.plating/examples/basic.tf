@@ -14,7 +14,7 @@ data "tofusoup_provider_versions" "aws_opentofu" {
 
 output "terraform_total_versions" {
   description = "Total number of AWS provider versions in Terraform registry"
-  value       = data.tofusoup_provider_versions.aws_terraform.count
+  value       = data.tofusoup_provider_versions.aws_terraform.version_count
 }
 
 output "terraform_latest_version" {
@@ -32,7 +32,7 @@ output "terraform_arm64_versions" {
 
 output "opentofu_total_versions" {
   description = "Total number of AWS provider versions in OpenTofu registry"
-  value       = data.tofusoup_provider_versions.aws_opentofu.count
+  value       = data.tofusoup_provider_versions.aws_opentofu.version_count
 }
 
 output "opentofu_latest_version" {
