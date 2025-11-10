@@ -47,7 +47,7 @@ strict = true
 asyncio_mode = "auto"
 testpaths = ["tests"]
 
-[tool.pyvider]
+[pyvider]
 component_packages = ["tofusoup.tf.components"]
 
 [tool.plating]
