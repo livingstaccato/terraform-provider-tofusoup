@@ -1,14 +1,11 @@
 """Tests for the state_outputs data source."""
 
-
 import pytest
 from pyvider.resources.context import ResourceContext
 from tofusoup.tf.components.data_sources.state_outputs import (
     StateOutputsConfig,
     StateOutputsDataSource,
 )
-
-
 
 
 class TestStateOutputsErrorHandling:

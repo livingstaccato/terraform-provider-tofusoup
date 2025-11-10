@@ -10,8 +10,6 @@ from tofusoup.tf.components.data_sources.state_outputs import (
 )
 
 
-
-
 class TestStateOutputsRead:
     """Tests for StateOutputsDataSource read method."""
 

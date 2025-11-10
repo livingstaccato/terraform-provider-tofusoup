@@ -1,6 +1,5 @@
 """Tests for tofusoup_module_search data source."""
 
-
 import pytest
 from pyvider.schema import PvsSchema  # type: ignore
 from tofusoup.tf.components.data_sources.module_search import (  # type: ignore
@@ -14,8 +13,6 @@ from tofusoup.tf.components.data_sources.module_search import (  # type: ignore
 def sample_config() -> ModuleSearchConfig:
     """Sample valid module search config."""
     return ModuleSearchConfig(query="vpc", registry="terraform", limit=20)
-
-
 
 
 class TestModuleSearchDataSource:

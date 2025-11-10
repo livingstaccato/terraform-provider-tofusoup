@@ -5,15 +5,12 @@
 
 """Tests for tofusoup_module_info data source."""
 
-
 import pytest
 
 from tofusoup.tf.components.data_sources.module_info import (  # type: ignore
     ModuleInfoConfig,
     ModuleInfoDataSource,
 )
-
-
 
 
 class TestModuleInfoValidation:

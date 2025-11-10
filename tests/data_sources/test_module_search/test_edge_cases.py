@@ -17,8 +17,6 @@ def sample_config() -> ModuleSearchConfig:
     return ModuleSearchConfig(query="vpc", registry="terraform", limit=20)
 
 
-
-
 class TestModuleSearchEdgeCases:
     """Edge case tests."""
 

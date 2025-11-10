@@ -20,8 +20,6 @@ from tofusoup.tf.components.data_sources.module_info import (  # type: ignore
 )
 
 
-
-
 class TestModuleInfoEdgeCases:
     """Edge case tests."""
 

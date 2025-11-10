@@ -18,8 +18,6 @@ from tofusoup.tf.components.data_sources.module_info import (  # type: ignore
 )
 
 
-
-
 class TestModuleInfoRead:
     """Tests for read() method."""
 
