@@ -4,14 +4,11 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from attrs import evolve
-from pyvider.exceptions import DataSourceError  # type: ignore
 from pyvider.resources.context import ResourceContext  # type: ignore
-from pyvider.schema import PvsSchema  # type: ignore
 from tofusoup.registry.models.module import Module  # type: ignore
 from tofusoup.tf.components.data_sources.module_search import (  # type: ignore
     ModuleSearchConfig,
     ModuleSearchDataSource,
-    ModuleSearchState,
 )
 
 
