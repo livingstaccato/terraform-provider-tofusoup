@@ -5,7 +5,7 @@ site_description: Terraform provider for TofuSoup registry queries and state ins
 dev_addr: 127.0.0.1:11014
 docs_dir: docs
 hooks:
-- scripts/mkdocs_hooks.py
+- ../provide-foundry/src/provide/foundry/theme/hooks/terraform_provider.py
 theme:
   name: material
   features:
