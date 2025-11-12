@@ -26,7 +26,7 @@ jobs:
   trigger_build:
     name: 🏗️ Trigger/Find Build
     runs-on: ubuntu-latest
-    if: ${{ inputs.build_run_id == '' }}
+    if: inputs.build_run_id == ''
     permissions:
       actions: write
       contents: read
@@ -80,7 +80,7 @@ jobs:
   wait_for_build:
     name: ⏳ Wait for Build
     needs: trigger_build
-    if: ${{ always() }}
+    if: always()
     runs-on: ubuntu-latest
     outputs:
       build_run_id: ${{ steps.wait.outputs.build_run_id }}
@@ -137,7 +137,7 @@ jobs:
   release:
     name: 🎉 Create Release
     needs: wait_for_build
-    if: ${{ always() && needs.wait_for_build.result == 'success' }}
+    if: always() && needs.wait_for_build.result == 'success'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -184,7 +184,7 @@ jobs:
           enable-cache: false
 
       - name: 📚 Generate Documentation
-        if: ${{ inputs.generate_docs == true }}
+        if: inputs.generate_docs == true
         run: |
           echo "📝 Generating documentation with plating..."
 
