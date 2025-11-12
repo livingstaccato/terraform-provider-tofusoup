@@ -89,7 +89,11 @@ jobs:
       - name: ⏳ Wait for build completion
         id: wait
         run: |
-          RUN_ID="${{ inputs.build_run_id }}" || RUN_ID="${{ needs.trigger_build.outputs.run_id }}"
+          if [[ -n "${{ inputs.build_run_id }}" ]]; then
+            RUN_ID="${{ inputs.build_run_id }}"
+          else
+            RUN_ID="${{ needs.trigger_build.outputs.run_id }}"
+          fi
           echo "build_run_id=${RUN_ID}" >> $GITHUB_OUTPUT
 
           # If provided or using existing successful build, skip waiting
