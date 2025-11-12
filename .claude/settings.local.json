@@ -55,7 +55,8 @@
       "Bash(mkdocs.yml)",
       "Bash(chmod:*)",
       "Bash(git add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(gh run view:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
