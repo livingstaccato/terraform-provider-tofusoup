@@ -38,13 +38,61 @@ Successfully migrated and adapted GitHub Actions workflows from `terraform-provi
 - linux_amd64 (Ubuntu 24.04)
 - darwin_arm64 (macOS 15 ARM)
 
+**Testing Strategy (Three-Tier Approach):**
+
+1. **Smoke Test 1:** Provider initialization (minimal config)
+   - Validates provider binary loads and responds
+   - Runs: `tofu init`, `tofu plan`
+
+2. **Smoke Test 2:** Registry query test
+   - Validates data source functionality
+   - Uses `tofusoup_provider_info` data source to query Terraform registry
+   - Runs: `tofu init`, `tofu plan`, `tofu apply`, `tofu output`
+
+3. **Single Test Verification:** Full lifecycle test (NEW)
+   - Acts as circuit breaker before full suite
+   - Tests `tofusoup_provider_versions` example
+   - Runs complete cycle: `tofu init` → `tofu plan` → `tofu apply` → `tofu destroy`
+   - If this fails, full conformance suite is skipped
+   - Uses `TF_LOG=DEBUG` and `PYVIDER_LOG_LEVEL=debug` for detailed logging
+
+4. **Full Conformance Suite:** All examples
+   - Runs `soup stir --recursive` on all 9 data source examples in `examples/data-sources/`
+   - Multi-threaded execution for performance
+   - Captures and parses output for intelligent error reporting
+   - Uses `TF_LOG=DEBUG` and `PYVIDER_LOG_LEVEL=debug`
+
+**Failure Handling (Hybrid Approach):**
+- **Platform Independence:** `fail-fast: false` - both platforms complete independently
+- **Circuit Breaker:** Single test acts as gate - full suite only runs if single test passes
+- **Failure Collection:** `continue-on-error: true` on full suite - collects all failures instead of stopping at first
+- **Intelligent Reporting:** Parses soup stir output to extract failure summaries and error details
+
+**Error Reporting Features:**
+- Captures soup stir output to `/tmp/conformance_output.txt`
+- Parses results to show pass/fail counts
+- Extracts failure details and error messages
+- Creates detailed job summary with:
+  - Results table by platform
+  - Test coverage breakdown
+  - Failure analysis with next steps
+  - Links to artifacts for detailed logs
+
+**Artifacts Uploaded (7-day retention):**
+- `conformance_output.txt` - Full soup stir output with error analysis
+- `.soup/logs/` - Individual test logs for each example
+- `terraform.log` - Detailed Terraform execution logs
+- `terraform.tfstate*` - State files from failed tests
+- `.terraform.lock.hcl` - Lock files for debugging
+- `crash.log` - Terraform crash logs if any
+
 **Major Changes from pyvider:**
 - Removed all PYVIDER_TESTMODE and PYVIDER_PRIVATE_STATE_SHARED_SECRET environment variables
 - Provider source: `local/providers/pyvider` → `local/providers/tofusoup`
-- **Smoke Test 1:** Provider initialization (minimal config)
-- **Smoke Test 2:** Registry query test using `tofusoup_provider_info` data source
-- **Removed:** Test mode rejection/success tests (not applicable to tofusoup - no test-only resources)
-- **Full Conformance:** Runs `soup stir --recursive` on `examples/data-sources/` directory
+- Added single test verification step as circuit breaker
+- Added hybrid failure handling for better error visibility
+- Added intelligent error reporting and parsing
+- Enhanced artifacts to include conformance output and crash logs
 
 **Trigger:**
 - Automatically after build workflow completes

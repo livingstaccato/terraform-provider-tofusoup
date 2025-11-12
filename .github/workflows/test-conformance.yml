@@ -283,42 +283,8 @@ jobs:
           TF_LOG: DEBUG
           PYVIDER_LOG_LEVEL: debug
         run: |
-          echo "════════════════════════════════════════════════════════════════"
-          echo "🔬 SINGLE TEST VERIFICATION"
-          echo "════════════════════════════════════════════════════════════════"
-          echo ""
-          echo "This test runs a full Terraform cycle (init → plan → apply →"
-          echo "destroy) on one example before running the full suite."
-          echo "Acts as a circuit breaker - if this fails, we skip the full suite."
-          echo ""
-          echo "Test: tofusoup_provider_versions"
-          echo "Platform: ${{ matrix.target }}"
-          echo ""
-
-          cd examples/data-sources/tofusoup_provider_versions
-
-          echo "🔧 Step 1: tofu init"
-          tofu init
-          echo ""
-
-          echo "📊 Step 2: tofu plan"
-          tofu plan
-          echo ""
-
-          echo "🚀 Step 3: tofu apply -auto-approve"
-          tofu apply -auto-approve
-          echo ""
-
-          echo "📤 Step 4: tofu output"
-          tofu output
-          echo ""
-
-          echo "🧹 Step 5: tofu destroy -auto-approve"
-          tofu destroy -auto-approve
-          echo ""
-
-          echo "✅ PASS: Single test verification completed successfully"
-          echo "════════════════════════════════════════════════════════════════"
+          chmod +x .github/scripts/single-test-verification.sh
+          .github/scripts/single-test-verification.sh tofusoup_provider_versions "${{ matrix.target }}"
 
       - name: 🧪 Run Full Conformance Tests
         id: full_conformance
@@ -328,44 +294,8 @@ jobs:
           TF_LOG: DEBUG
           PYVIDER_LOG_LEVEL: debug
         run: |
-          echo "════════════════════════════════════════════════════════════════"
-          echo "🧪 FULL CONFORMANCE TEST SUITE"
-          echo "════════════════════════════════════════════════════════════════"
-          echo ""
-          echo "🔍 Running conformance tests on all data source examples..."
-          echo "   Platform: ${{ matrix.target }}"
-          echo ""
-
-          # Run soup stir on all data-sources examples recursively
-          cd examples/data-sources
-
-          # Capture output and save to file for parsing
-          set +e
-          soup stir --recursive 2>&1 | tee /tmp/conformance_output.txt
-          SOUP_EXIT_CODE=${PIPESTATUS[0]}
-          set -e
-
-          echo ""
-          echo "════════════════════════════════════════════════════════════════"
-
-          # Parse results and create summary
-          if grep -q "All Tests Passed" /tmp/conformance_output.txt; then
-            echo "✅ All provider conformance tests passed!"
-            echo "CONFORMANCE_STATUS=success" >> $GITHUB_ENV
-          else
-            echo "⚠️  Some conformance tests failed"
-            echo "CONFORMANCE_STATUS=failed" >> $GITHUB_ENV
-
-            # Extract failure summary
-            echo ""
-            echo "📊 Test Summary:"
-            grep -A 10 "Some Tests Failed\|All Tests Passed" /tmp/conformance_output.txt || echo "Could not extract summary"
-          fi
-
-          echo "════════════════════════════════════════════════════════════════"
-
-          # Exit with soup's exit code (but step won't fail due to continue-on-error)
-          exit $SOUP_EXIT_CODE
+          chmod +x .github/scripts/run-conformance-suite.sh
+          .github/scripts/run-conformance-suite.sh "${{ matrix.target }}"
 
       - name: 📤 Upload test logs and artifacts
         if: always()
