@@ -90,7 +90,11 @@ jobs:
         id: wait
         run: |
           # Handle both provided and auto-generated run IDs
-          RUN_ID="${{ inputs.build_run_id || needs.trigger_build.outputs.run_id }}"
+          if [[ -n "${{ inputs.build_run_id }}" ]]; then
+            RUN_ID="${{ inputs.build_run_id }}"
+          else
+            RUN_ID="${{ needs.trigger_build.outputs.run_id }}"
+          fi
           echo "build_run_id=${RUN_ID}" >> $GITHUB_OUTPUT
 
           # If using existing successful build, skip waiting
