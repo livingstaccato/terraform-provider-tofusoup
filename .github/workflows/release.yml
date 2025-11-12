@@ -80,7 +80,7 @@ jobs:
   wait_for_build:
     name: ⏳ Wait for Build
     needs: trigger_build
-    if: always() && (inputs.build_run_id != '' || needs.trigger_build.outputs.run_id != '')
+    if: always() && needs.trigger_build.result != 'cancelled'
     runs-on: ubuntu-latest
     outputs:
       build_run_id: ${{ steps.wait.outputs.build_run_id }}
