@@ -73,7 +73,8 @@
       "Bash(for dir in examples/data-sources/tofusoup_state_*/)",
       "Bash(gh workflow run:*)",
       "Bash(gh run list:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "WebFetch(domain:github.com)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
