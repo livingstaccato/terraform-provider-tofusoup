@@ -44,22 +44,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Try to find last successful build first
-          echo "🔍 Checking for last successful build..."
-
-          # First, get the raw list
-          echo "   Fetching completed runs..."
           RUN_LIST=$(gh run list \
             --workflow build-provider.yml \
             --status completed \
             --limit 1 \
             --json databaseId,conclusion)
 
-          echo "   Raw output: $RUN_LIST"
-
-          # Then filter for success
           RUN_ID=$(echo "$RUN_LIST" | jq '.[] | select(.conclusion=="success") | .databaseId')
-
-          echo "   Filtered ID: $RUN_ID"
 
           if [[ -n "$RUN_ID" ]] && [[ "$RUN_ID" != "null" ]]; then
             echo "✅ Using last successful build: ${RUN_ID}"
