@@ -59,4 +59,3 @@ site/
 .DS_Store
 Thumbs.db
 .soup/logs/*
-**/.soup/logs/*
