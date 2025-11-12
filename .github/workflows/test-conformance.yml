@@ -34,6 +34,8 @@ jobs:
     steps:
       - name: 📋 Determine build run ID
         id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           SKIP_BOT="${{ inputs.skip_bot }}"
           SHOULD_RUN="true"
@@ -54,15 +56,23 @@ jobs:
               echo "✅ Running tests with artifacts from specified build run: ${BUILD_RUN_ID}"
             else
               # Get last successful build using gh CLI
+              echo "📋 Querying last successful build-provider.yml run..."
               BUILD_RUN_ID=$(gh run list \
                 --workflow build-provider.yml \
                 --status completed \
                 --conclusion success \
                 --limit 1 \
                 --json databaseId \
-                --jq '.[0].databaseId' 2>/dev/null || echo "")
+                --jq '.[0].databaseId' 2>&1)
 
-              if [[ -n "$BUILD_RUN_ID" ]]; then
+              QUERY_EXIT=$?
+              if [[ $QUERY_EXIT -ne 0 ]]; then
+                echo "⚠️  gh run list failed with exit code $QUERY_EXIT"
+                echo "Output: $BUILD_RUN_ID"
+                BUILD_RUN_ID=""
+              fi
+
+              if [[ -n "$BUILD_RUN_ID" ]] && [[ "$BUILD_RUN_ID" != "null" ]]; then
                 echo "✅ Using last successful build run: ${BUILD_RUN_ID}"
               else
                 SHOULD_RUN="false"

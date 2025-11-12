@@ -37,6 +37,8 @@ jobs:
     steps:
       - name: 🔍 Check for last successful build
         id: determine
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Try to find last successful build first
           RUN_ID=$(gh run list \
