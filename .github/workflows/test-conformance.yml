@@ -32,6 +32,9 @@ jobs:
       skip_bot: ${{ steps.check.outputs.skip_bot }}
 
     steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
       - name: 📋 Determine build run ID
         id: check
         env:

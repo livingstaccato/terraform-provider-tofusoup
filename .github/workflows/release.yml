@@ -35,6 +35,9 @@ jobs:
       use_existing: ${{ steps.determine.outputs.use_existing }}
 
     steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
       - name: 🔍 Check for last successful build
         id: determine
         env:
