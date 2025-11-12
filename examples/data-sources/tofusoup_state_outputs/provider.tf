@@ -1,11 +1,11 @@
 terraform {
   required_providers {
-    tofusoup = {
-      source  = "local/providers/tofusoup"
+    pyvider = {
+      source  = "local/providers/pyvider"
     }
   }
 }
 
-provider "tofusoup" {
+provider "pyvider" {
   # Add your configuration options here
 }
