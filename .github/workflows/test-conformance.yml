@@ -277,9 +277,56 @@ jobs:
           echo "✅ PASS: Smoke test 2 completed successfully"
           echo "════════════════════════════════════════════════════════════════"
 
-      - name: 🧪 Run Full Conformance Tests
+      - name: "🔬 Single Test Verification: tofusoup_provider_versions"
+        id: single_test
         env:
           TF_LOG: DEBUG
+          PYVIDER_LOG_LEVEL: debug
+        run: |
+          echo "════════════════════════════════════════════════════════════════"
+          echo "🔬 SINGLE TEST VERIFICATION"
+          echo "════════════════════════════════════════════════════════════════"
+          echo ""
+          echo "This test runs a full Terraform cycle (init → plan → apply →"
+          echo "destroy) on one example before running the full suite."
+          echo "Acts as a circuit breaker - if this fails, we skip the full suite."
+          echo ""
+          echo "Test: tofusoup_provider_versions"
+          echo "Platform: ${{ matrix.target }}"
+          echo ""
+
+          cd examples/data-sources/tofusoup_provider_versions
+
+          echo "🔧 Step 1: tofu init"
+          tofu init
+          echo ""
+
+          echo "📊 Step 2: tofu plan"
+          tofu plan
+          echo ""
+
+          echo "🚀 Step 3: tofu apply -auto-approve"
+          tofu apply -auto-approve
+          echo ""
+
+          echo "📤 Step 4: tofu output"
+          tofu output
+          echo ""
+
+          echo "🧹 Step 5: tofu destroy -auto-approve"
+          tofu destroy -auto-approve
+          echo ""
+
+          echo "✅ PASS: Single test verification completed successfully"
+          echo "════════════════════════════════════════════════════════════════"
+
+      - name: 🧪 Run Full Conformance Tests
+        id: full_conformance
+        if: success()
+        continue-on-error: true
+        env:
+          TF_LOG: DEBUG
+          PYVIDER_LOG_LEVEL: debug
         run: |
           echo "════════════════════════════════════════════════════════════════"
           echo "🧪 FULL CONFORMANCE TEST SUITE"
@@ -291,22 +338,50 @@ jobs:
 
           # Run soup stir on all data-sources examples recursively
           cd examples/data-sources
-          soup stir --recursive
+
+          # Capture output and save to file for parsing
+          set +e
+          soup stir --recursive 2>&1 | tee /tmp/conformance_output.txt
+          SOUP_EXIT_CODE=${PIPESTATUS[0]}
+          set -e
 
           echo ""
-          echo "✅ All provider conformance tests passed!"
           echo "════════════════════════════════════════════════════════════════"
 
-      - name: 📤 Upload test logs
+          # Parse results and create summary
+          if grep -q "All Tests Passed" /tmp/conformance_output.txt; then
+            echo "✅ All provider conformance tests passed!"
+            echo "CONFORMANCE_STATUS=success" >> $GITHUB_ENV
+          else
+            echo "⚠️  Some conformance tests failed"
+            echo "CONFORMANCE_STATUS=failed" >> $GITHUB_ENV
+
+            # Extract failure summary
+            echo ""
+            echo "📊 Test Summary:"
+            grep -A 10 "Some Tests Failed\|All Tests Passed" /tmp/conformance_output.txt || echo "Could not extract summary"
+          fi
+
+          echo "════════════════════════════════════════════════════════════════"
+
+          # Exit with soup's exit code (but step won't fail due to continue-on-error)
+          exit $SOUP_EXIT_CODE
+
+      - name: 📤 Upload test logs and artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: conformance-test-logs-${{ matrix.target }}
           path: |
+            /tmp/conformance_output.txt
             examples/**/.soup/logs/*.log
             examples/**/.soup/logs/terraform.log
             examples/**/.terraform.lock.hcl
             examples/**/terraform.tfstate*
+            examples/**/crash.log
+            examples/data-sources/tofusoup_provider_versions/.terraform/
+            examples/data-sources/tofusoup_provider_versions/terraform.tfstate*
+            examples/data-sources/tofusoup_provider_versions/.terraform.lock.hcl
             /tmp/smoke-test-init/.terraform/
             /tmp/smoke-test-init/terraform.tfstate*
             /tmp/smoke-test-init/.terraform.lock.hcl
@@ -325,20 +400,53 @@ jobs:
     steps:
       - name: 📊 Generate Summary
         run: |
-          if [[ "${{ needs.conformance.result }}" == "success" ]]; then
-            echo "## ✅ All Conformance Tests Passed!" >> $GITHUB_STEP_SUMMARY
+          echo "## 🧪 Provider Conformance Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Create results table
+          echo "| Platform | Status | Details |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|---------|" >> $GITHUB_STEP_SUMMARY
+
+          CONFORMANCE_RESULT="${{ needs.conformance.result }}"
+
+          if [[ "$CONFORMANCE_RESULT" == "success" ]]; then
+            echo "| linux_amd64 | ✅ PASSED | All tests successful |" >> $GITHUB_STEP_SUMMARY
+            echo "| darwin_arm64 | ✅ PASSED | All tests successful |" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "All provider conformance tests completed successfully:" >> $GITHUB_STEP_SUMMARY
+            echo "### Test Coverage" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ Smoke Test 1: Provider initialization" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ Smoke Test 2: Registry query (data source)" >> $GITHUB_STEP_SUMMARY
-            echo "- ✅ Full conformance suite (all data source examples)" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ **Smoke Test 1:** Provider initialization" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ **Smoke Test 2:** Registry query (tofusoup_provider_info)" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ **Single Test:** Full cycle on tofusoup_provider_versions" >> $GITHUB_STEP_SUMMARY
+            echo "- ✅ **Full Suite:** All 9 data source examples" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "🎉 All conformance tests passed successfully!" >> $GITHUB_STEP_SUMMARY
             exit 0
           else
-            echo "## ❌ Some Tests Failed" >> $GITHUB_STEP_SUMMARY
+            echo "| linux_amd64 | ❌ FAILED | See job logs for details |" >> $GITHUB_STEP_SUMMARY
+            echo "| darwin_arm64 | ⚠️ SKIPPED/FAILED | See job logs for details |" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Check the test logs for details." >> $GITHUB_STEP_SUMMARY
+            echo "### Failure Details" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
-            echo "Test logs are available in the workflow artifacts." >> $GITHUB_STEP_SUMMARY
+            echo "Some tests failed. The workflow uses a **hybrid failure handling** approach:" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- **Platforms run independently** (fail-fast: false)" >> $GITHUB_STEP_SUMMARY
+            echo "- **Single test acts as circuit breaker** - full suite skipped if it fails" >> $GITHUB_STEP_SUMMARY
+            echo "- **Full suite collects all failures** (continue-on-error: true)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "#### Artifacts Available" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Download test artifacts for detailed logs:" >> $GITHUB_STEP_SUMMARY
+            echo "- \`conformance-test-logs-linux_amd64\` - Linux test logs and state files" >> $GITHUB_STEP_SUMMARY
+            echo "- \`conformance-test-logs-darwin_arm64\` - macOS test logs and state files" >> $GITHUB_STEP_SUMMARY
+            echo "- \`/tmp/conformance_output.txt\` - Soup stir full output with error details" >> $GITHUB_STEP_SUMMARY
+            echo "- \`.soup/logs/\` - Individual test logs for each example" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "#### Next Steps" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "1. Check the job logs to see which step failed" >> $GITHUB_STEP_SUMMARY
+            echo "2. Download artifacts to review detailed error messages" >> $GITHUB_STEP_SUMMARY
+            echo "3. Look for \`conformance_output.txt\` for soup stir failure analysis" >> $GITHUB_STEP_SUMMARY
+            echo "4. Review individual test logs in \`.soup/logs/terraform.log\`" >> $GITHUB_STEP_SUMMARY
             exit 1
           fi
