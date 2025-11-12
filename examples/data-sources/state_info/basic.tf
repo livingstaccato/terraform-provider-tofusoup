@@ -1,6 +1,6 @@
 # Read state file metadata
 data "tofusoup_state_info" "current" {
-  state_path = "./terraform.tfstate-example"
+  state_path = "/Users/tim/code/gh/provide-io/terraform-provider-tofusoup/examples/data-sources/state_info/terraform.tfstate-example"
 }
 
 output "state_summary" {
