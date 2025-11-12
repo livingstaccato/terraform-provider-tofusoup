@@ -60,7 +60,8 @@
       "Bash(soup stir --help:*)",
       "Bash(alias:*)",
       "Bash(/usr/bin/make:*)",
-      "Bash(env)"
+      "Bash(env)",
+      "Bash(soup stir:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
