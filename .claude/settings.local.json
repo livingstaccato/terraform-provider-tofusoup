@@ -71,7 +71,8 @@
       "Bash(.github/scripts/run-conformance-suite.sh:*)",
       "Bash(git check-ignore:*)",
       "Bash(for dir in examples/data-sources/tofusoup_state_*/)",
-      "Bash(gh workflow run:*)"
+      "Bash(gh workflow run:*)",
+      "Bash(gh run list:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
