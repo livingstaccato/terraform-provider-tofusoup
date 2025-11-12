@@ -88,21 +88,17 @@ jobs:
     steps:
       - name: ⏳ Wait for build completion
         id: wait
-        env:
-          PROVIDED_ID: ${{ inputs.build_run_id }}
-          AUTO_ID: ${{ needs.trigger_build.outputs.run_id }}
-          USE_EXISTING: ${{ needs.trigger_build.outputs.use_existing }}
         run: |
-          # Handle both provided and auto-generated run IDs
-          if [[ -n "$PROVIDED_ID" ]]; then
-            RUN_ID="$PROVIDED_ID"
-          else
-            RUN_ID="$AUTO_ID"
-          fi
+          RUN_ID="${{ inputs.build_run_id }}" || RUN_ID="${{ needs.trigger_build.outputs.run_id }}"
           echo "build_run_id=${RUN_ID}" >> $GITHUB_OUTPUT
 
-          # If using existing successful build, skip waiting
-          if [[ "$USE_EXISTING" == "true" ]] || [[ -n "$PROVIDED_ID" ]]; then
+          # If provided or using existing successful build, skip waiting
+          if [[ -n "${{ inputs.build_run_id }}" ]]; then
+            echo "✅ Using provided build_run_id: ${RUN_ID}"
+            exit 0
+          fi
+
+          if [[ "${{ needs.trigger_build.outputs.use_existing }}" == "true" ]]; then
             echo "✅ Using existing successful build: ${RUN_ID}"
             exit 0
           fi
