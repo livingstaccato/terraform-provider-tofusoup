@@ -56,7 +56,8 @@
       "Bash(chmod:*)",
       "Bash(git add:*)",
       "Bash(git push:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(soup stir --help:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
