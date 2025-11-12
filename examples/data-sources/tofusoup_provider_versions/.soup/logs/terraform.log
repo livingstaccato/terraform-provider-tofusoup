@@ -1,0 +1,52 @@
+{"@level":"trace","@message":"OpenTelemetry: OTEL_TRACES_EXPORTER not set, OTel tracing is not enabled","@timestamp":"2025-11-11T18:43:38.644733-08:00"}
+{"@level":"info","@message":"OpenTofu version: 1.10.6","@timestamp":"2025-11-11T18:43:38.644891-08:00"}
+{"@level":"debug","@message":"using github.com/hashicorp/go-tfe v1.53.0","@timestamp":"2025-11-11T18:43:38.644940-08:00"}
+{"@level":"debug","@message":"using github.com/opentofu/hcl/v2 v2.20.2-0.20250121132637-504036cd70e7","@timestamp":"2025-11-11T18:43:38.644954-08:00"}
+{"@level":"debug","@message":"using github.com/hashicorp/terraform-svchost v0.1.1","@timestamp":"2025-11-11T18:43:38.644962-08:00"}
+{"@level":"debug","@message":"using github.com/zclconf/go-cty v1.16.3","@timestamp":"2025-11-11T18:43:38.644972-08:00"}
+{"@level":"info","@message":"Go runtime version: go1.25.0","@timestamp":"2025-11-11T18:43:38.644980-08:00"}
+{"@level":"info","@message":"CLI args: []string{\"/opt/homebrew/bin/tofu\", \"init\", \"-no-color\", \"-input=false\"}","@timestamp":"2025-11-11T18:43:38.644990-08:00"}
+{"@level":"trace","@message":"Stdout is not a terminal","@timestamp":"2025-11-11T18:43:38.645002-08:00"}
+{"@level":"trace","@message":"Stderr is not a terminal","@timestamp":"2025-11-11T18:43:38.645008-08:00"}
+{"@level":"trace","@message":"Stdin is a terminal","@timestamp":"2025-11-11T18:43:38.645017-08:00"}
+{"@level":"debug","@message":"Attempting to open CLI config file: /Users/tim/.terraformrc","@timestamp":"2025-11-11T18:43:38.645039-08:00"}
+{"@level":"info","@message":"Loading CLI configuration from /Users/tim/.terraformrc","@timestamp":"2025-11-11T18:43:38.645081-08:00"}
+{"@level":"info","@message":"Loading CLI configuration from /Users/tim/.terraform.d/credentials.tfrc.json","@timestamp":"2025-11-11T18:43:38.645233-08:00"}
+{"@level":"debug","@message":"checking for credentials in \"/Users/tim/.terraform.d/plugins\"","@timestamp":"2025-11-11T18:43:38.645348-08:00"}
+{"@level":"debug","@message":"ignoring non-existing provider search directory terraform.d/plugins","@timestamp":"2025-11-11T18:43:38.645432-08:00"}
+{"@level":"debug","@message":"will search for provider plugins in /Users/tim/.terraform.d/plugins","@timestamp":"2025-11-11T18:43:38.645451-08:00"}
+{"@level":"trace","@message":"getproviders.SearchLocalDirectory: found local/providers/pyvider v0.0.0 for darwin_arm64 at /Users/tim/.terraform.d/plugins/local/providers/pyvider/0.0.0/darwin_arm64","@timestamp":"2025-11-11T18:43:38.645721-08:00"}
+{"@level":"trace","@message":"getproviders.SearchLocalDirectory: found local/providers/pyvider v0.0.1100-1 for darwin_arm64 at /Users/tim/.terraform.d/plugins/local/providers/pyvider/0.0.1100-1/darwin_arm64","@timestamp":"2025-11-11T18:43:38.645823-08:00"}
+{"@level":"trace","@message":"getproviders.SearchLocalDirectory: found local/providers/pyvider v0.0.1101 for darwin_arm64 at /Users/tim/.terraform.d/plugins/local/providers/pyvider/0.0.1101/darwin_arm64","@timestamp":"2025-11-11T18:43:38.645897-08:00"}
+{"@level":"trace","@message":"getproviders.SearchLocalDirectory: found local/providers/pyvider v0.0.1108 for darwin_arm64 at /Users/tim/.terraform.d/plugins/local/providers/pyvider/0.0.1108/darwin_arm64","@timestamp":"2025-11-11T18:43:38.646006-08:00"}
+{"@level":"trace","@message":"getproviders.SearchLocalDirectory: found local/providers/pyvider v0.0.1109 for darwin_arm64 at /Users/tim/.terraform.d/plugins/local/providers/pyvider/0.0.1109/darwin_arm64","@timestamp":"2025-11-11T18:43:38.646122-08:00"}
+{"@level":"trace","@message":"getproviders.SearchLocalDirectory: found local/providers/pyvider v0.0.19 for darwin_arm64 at /Users/tim/.terraform.d/plugins/local/providers/pyvider/0.0.19/darwin_arm64","@timestamp":"2025-11-11T18:43:38.646244-08:00"}
+{"@level":"trace","@message":"getproviders.SearchLocalDirectory: found local/providers/tofusoup v0.0.0 for darwin_arm64 at /Users/tim/.terraform.d/plugins/local/providers/tofusoup/0.0.0/darwin_arm64","@timestamp":"2025-11-11T18:43:38.646342-08:00"}
+{"@level":"trace","@message":"getproviders.SearchLocalDirectory: found local/providers/tofusoup v0.0.1108 for darwin_arm64 at /Users/tim/.terraform.d/plugins/local/providers/tofusoup/0.0.1108/darwin_arm64","@timestamp":"2025-11-11T18:43:38.646405-08:00"}
+{"@level":"debug","@message":"ignoring non-existing provider search directory /Users/tim/Library/Application Support/io.terraform/plugins","@timestamp":"2025-11-11T18:43:38.646440-08:00"}
+{"@level":"debug","@message":"ignoring non-existing provider search directory /Library/Application Support/io.terraform/plugins","@timestamp":"2025-11-11T18:43:38.646450-08:00"}
+{"@level":"debug","@message":"Found the config directory: /Users/tim/.terraform.d","@timestamp":"2025-11-11T18:43:38.646639-08:00"}
+{"@level":"info","@message":"CLI command args: []string{\"init\", \"-no-color\", \"-input=false\"}","@timestamp":"2025-11-11T18:43:38.646696-08:00"}
+{"@level":"trace","@message":"Meta.Backend: no config given or present on disk, so returning nil config","@timestamp":"2025-11-11T18:43:38.647845-08:00"}
+{"@level":"trace","@message":"Meta.Backend: backend has not previously been initialized in this working directory","@timestamp":"2025-11-11T18:43:38.647890-08:00"}
+{"@level":"debug","@message":"New state was assigned lineage \"2779a5bc-7b76-db8b-3fae-2e3ccb050ee4\"","@timestamp":"2025-11-11T18:43:38.647911-08:00"}
+{"@level":"trace","@message":"Meta.Backend: using default local state only (no backend configuration, and no existing initialized backend)","@timestamp":"2025-11-11T18:43:38.647922-08:00"}
+{"@level":"trace","@message":"Meta.Backend: instantiated backend of type \u003cnil\u003e","@timestamp":"2025-11-11T18:43:38.647933-08:00"}
+{"@level":"debug","@message":"checking for provisioner in \".\"","@timestamp":"2025-11-11T18:43:38.648022-08:00"}
+{"@level":"debug","@message":"checking for provisioner in \"/opt/homebrew/bin\"","@timestamp":"2025-11-11T18:43:38.650467-08:00"}
+{"@level":"debug","@message":"checking for provisioner in \"/Users/tim/.terraform.d/plugins\"","@timestamp":"2025-11-11T18:43:38.650570-08:00"}
+{"@level":"trace","@message":"Meta.Backend: backend \u003cnil\u003e does not support operations, so wrapping it in a local backend","@timestamp":"2025-11-11T18:43:38.650594-08:00"}
+{"@level":"trace","@message":"backend/local: state manager for workspace \"default\" will:\n - read initial snapshot from terraform.tfstate\n - write new snapshots to terraform.tfstate\n - create any backup at terraform.tfstate.backup","@timestamp":"2025-11-11T18:43:38.650619-08:00"}
+{"@level":"trace","@message":"statemgr.Filesystem: reading initial snapshot from terraform.tfstate","@timestamp":"2025-11-11T18:43:38.650628-08:00"}
+{"@level":"trace","@message":"statemgr.Filesystem: snapshot file has nil snapshot, but that's okay","@timestamp":"2025-11-11T18:43:38.650638-08:00"}
+{"@level":"trace","@message":"statemgr.Filesystem: read nil snapshot","@timestamp":"2025-11-11T18:43:38.650643-08:00"}
+{"@level":"debug","@message":"Service discovery for registry.opentofu.org at https://registry.opentofu.org/.well-known/terraform.json","@timestamp":"2025-11-11T18:43:38.650919-08:00"}
+{"@level":"trace","@message":"HTTP client GET request to https://registry.opentofu.org/.well-known/terraform.json","@timestamp":"2025-11-11T18:43:38.650945-08:00"}
+{"@level":"debug","@message":"GET https://registry.opentofu.org/v1/providers/hashicorp/tofusoup/versions","@timestamp":"2025-11-11T18:43:39.084754-08:00"}
+{"@level":"trace","@message":"HTTP client GET request to https://registry.opentofu.org/v1/providers/hashicorp/tofusoup/versions","@timestamp":"2025-11-11T18:43:39.084877-08:00"}
+{"@level":"debug","@message":"GET https://registry.opentofu.org/v1/providers/-/tofusoup/versions","@timestamp":"2025-11-11T18:43:39.516740-08:00"}
+{"@level":"trace","@message":"HTTP client GET request to https://registry.opentofu.org/v1/providers/-/tofusoup/versions","@timestamp":"2025-11-11T18:43:39.516864-08:00"}
+{"@level":"trace","@message":"Attempting to acquire global provider lock /Users/tim/.tofusoup/plugin-cache/local/providers/pyvider/0.0.1109/darwin_arm64.lock","@timestamp":"2025-11-11T18:43:39.771930-08:00"}
+{"@level":"trace","@message":"providercache.Dir.InstallPackage: installing local/providers/pyvider v0.0.1109 from /Users/tim/.terraform.d/plugins/local/providers/pyvider/0.0.1109/darwin_arm64","@timestamp":"2025-11-11T18:43:39.774992-08:00"}
+{"@level":"trace","@message":"Releasing global provider lock /Users/tim/.tofusoup/plugin-cache/local/providers/pyvider/0.0.1109/darwin_arm64.lock","@timestamp":"2025-11-11T18:43:39.775122-08:00"}
+{"@level":"trace","@message":"providercache.Dir.LinkFromOtherCache: linking local/providers/pyvider v0.0.1109 from existing cache /Users/tim/.tofusoup/plugin-cache/local/providers/pyvider/0.0.1109/darwin_arm64 to /Users/tim/code/gh/provide-io/terraform-provider-tofusoup/examples/data-sources/tofusoup_provider_versions/.soup/tfdata/providers/local/providers/pyvider/0.0.1109/darwin_arm64","@timestamp":"2025-11-11T18:43:40.101079-08:00"}
