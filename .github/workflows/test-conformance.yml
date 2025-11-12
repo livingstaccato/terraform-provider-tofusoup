@@ -61,10 +61,9 @@ jobs:
               if BUILD_RUN_ID=$(gh run list \
                 --workflow build-provider.yml \
                 --status completed \
-                --conclusion success \
                 --limit 1 \
-                --json databaseId \
-                --jq '.[0].databaseId'); then
+                --json databaseId,conclusion \
+                --jq '.[] | select(.conclusion=="success") | .databaseId'); then
 
                 if [[ -n "$BUILD_RUN_ID" ]] && [[ "$BUILD_RUN_ID" != "null" ]]; then
                   echo "✅ Using last successful build run: ${BUILD_RUN_ID}"
