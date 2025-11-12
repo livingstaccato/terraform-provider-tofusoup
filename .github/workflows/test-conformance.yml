@@ -277,14 +277,14 @@ jobs:
           echo "✅ PASS: Smoke test 2 completed successfully"
           echo "════════════════════════════════════════════════════════════════"
 
-      - name: "🔬 Single Test Verification: tofusoup_provider_versions"
+      - name: "🔬 Single Test Verification: provider_versions"
         id: single_test
         env:
           TF_LOG: DEBUG
           PYVIDER_LOG_LEVEL: debug
         run: |
           chmod +x .github/scripts/single-test-verification.sh
-          .github/scripts/single-test-verification.sh tofusoup_provider_versions "${{ matrix.target }}"
+          .github/scripts/single-test-verification.sh provider_versions "${{ matrix.target }}"
 
       - name: 🧪 Run Full Conformance Tests
         id: full_conformance
@@ -309,9 +309,9 @@ jobs:
             examples/**/.terraform.lock.hcl
             examples/**/terraform.tfstate*
             examples/**/crash.log
-            examples/data-sources/tofusoup_provider_versions/.terraform/
-            examples/data-sources/tofusoup_provider_versions/terraform.tfstate*
-            examples/data-sources/tofusoup_provider_versions/.terraform.lock.hcl
+            examples/data-sources/provider_versions/.terraform/
+            examples/data-sources/provider_versions/terraform.tfstate*
+            examples/data-sources/provider_versions/.terraform.lock.hcl
             /tmp/smoke-test-init/.terraform/
             /tmp/smoke-test-init/terraform.tfstate*
             /tmp/smoke-test-init/.terraform.lock.hcl
