@@ -41,36 +41,41 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Try to find last successful build first
-          RUN_ID=$(gh run list \
+          echo "🔍 Checking for last successful build..."
+          if RUN_ID=$(gh run list \
             --workflow build-provider.yml \
             --status completed \
             --conclusion success \
             --limit 1 \
             --json databaseId \
-            --jq '.[0].databaseId' 2>/dev/null || echo "")
+            --jq '.[0].databaseId'); then
 
-          if [[ -n "$RUN_ID" ]]; then
-            echo "✅ Using last successful build: ${RUN_ID}"
-            echo "run_id=${RUN_ID}" >> $GITHUB_OUTPUT
-            echo "use_existing=true" >> $GITHUB_OUTPUT
+            if [[ -n "$RUN_ID" ]] && [[ "$RUN_ID" != "null" ]]; then
+              echo "✅ Using last successful build: ${RUN_ID}"
+              echo "run_id=${RUN_ID}" >> $GITHUB_OUTPUT
+              echo "use_existing=true" >> $GITHUB_OUTPUT
+            else
+              # No successful build found, trigger a new one
+              echo "⏳ No successful build found, triggering new build..."
+              gh workflow run build-provider.yml
+
+              # Wait a bit for the workflow to start
+              sleep 5
+
+              # Get the latest run
+              RUN_ID=$(gh run list \
+                --workflow build-provider.yml \
+                --limit 1 \
+                --json databaseId \
+                --jq '.[0].databaseId')
+
+              echo "🚀 Build workflow triggered: ${RUN_ID}"
+              echo "run_id=${RUN_ID}" >> $GITHUB_OUTPUT
+              echo "use_existing=false" >> $GITHUB_OUTPUT
+            fi
           else
-            # No successful build found, trigger a new one
-            echo "⏳ No successful build found, triggering new build..."
-            gh workflow run build-provider.yml
-
-            # Wait a bit for the workflow to start
-            sleep 5
-
-            # Get the latest run
-            RUN_ID=$(gh run list \
-              --workflow build-provider.yml \
-              --limit 1 \
-              --json databaseId \
-              --jq '.[0].databaseId')
-
-            echo "🚀 Build workflow triggered: ${RUN_ID}"
-            echo "run_id=${RUN_ID}" >> $GITHUB_OUTPUT
-            echo "use_existing=false" >> $GITHUB_OUTPUT
+            echo "❌ ERROR: Failed to query builds with gh CLI"
+            exit 1
           fi
 
   # Wait for build to complete

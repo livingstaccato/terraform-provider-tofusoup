@@ -57,26 +57,24 @@ jobs:
             else
               # Get last successful build using gh CLI
               echo "📋 Querying last successful build-provider.yml run..."
-              BUILD_RUN_ID=$(gh run list \
+
+              if BUILD_RUN_ID=$(gh run list \
                 --workflow build-provider.yml \
                 --status completed \
                 --conclusion success \
                 --limit 1 \
                 --json databaseId \
-                --jq '.[0].databaseId' 2>&1)
+                --jq '.[0].databaseId'); then
 
-              QUERY_EXIT=$?
-              if [[ $QUERY_EXIT -ne 0 ]]; then
-                echo "⚠️  gh run list failed with exit code $QUERY_EXIT"
-                echo "Output: $BUILD_RUN_ID"
-                BUILD_RUN_ID=""
-              fi
-
-              if [[ -n "$BUILD_RUN_ID" ]] && [[ "$BUILD_RUN_ID" != "null" ]]; then
-                echo "✅ Using last successful build run: ${BUILD_RUN_ID}"
+                if [[ -n "$BUILD_RUN_ID" ]] && [[ "$BUILD_RUN_ID" != "null" ]]; then
+                  echo "✅ Using last successful build run: ${BUILD_RUN_ID}"
+                else
+                  SHOULD_RUN="false"
+                  echo "❌ ERROR: No successful build found (query returned empty). Please run the Build Provider Binary workflow first."
+                fi
               else
                 SHOULD_RUN="false"
-                echo "❌ ERROR: No successful build found. Please run the Build Provider Binary workflow first."
+                echo "❌ ERROR: Failed to query builds with gh CLI. Are you authenticated?"
               fi
             fi
           else
