@@ -61,7 +61,9 @@
       "Bash(alias:*)",
       "Bash(/usr/bin/make:*)",
       "Bash(env)",
-      "Bash(soup stir:*)"
+      "Bash(soup stir:*)",
+      "Bash(TF_LOG=debug PYVIDER_LOG_LEVEL=debug soup stir:*)",
+      "Bash(export TF_LOG=debug PYVIDER_LOG_LEVEL=debug)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
