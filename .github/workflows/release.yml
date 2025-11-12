@@ -145,7 +145,7 @@ jobs:
     steps:
       - name: 🤖 Generate App Token
         id: app-token
-        if: secrets.PROVIDE_BOT_APP_ID && secrets.PROVIDE_BOT_PRIVATE_KEY
+        if: ${{ secrets.PROVIDE_BOT_APP_ID && secrets.PROVIDE_BOT_PRIVATE_KEY }}
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ secrets.PROVIDE_BOT_APP_ID }}
@@ -198,7 +198,7 @@ jobs:
           ls -la docs/
 
       - name: 💾 Commit Documentation
-        if: inputs.generate_docs == true && secrets.PROVIDE_BOT_APP_ID
+        if: ${{ inputs.generate_docs == true && secrets.PROVIDE_BOT_APP_ID }}
         run: |
           # Configure git with providebot[bot] identity
           git config user.name "providebot[bot]"
@@ -356,7 +356,7 @@ jobs:
           EOF
 
       - name: 🏷️ Create Git tag
-        if: secrets.PROVIDE_BOT_APP_ID
+        if: ${{ secrets.PROVIDE_BOT_APP_ID }}
         run: |
           # Configure git with providebot[bot] identity
           git config user.name "providebot[bot]"
@@ -367,7 +367,7 @@ jobs:
           git push origin "v${{ steps.version.outputs.VERSION }}" || echo "Tag already exists on remote"
 
       - name: 🚀 Create GitHub Release
-        if: secrets.PROVIDE_BOT_APP_ID
+        if: ${{ secrets.PROVIDE_BOT_APP_ID }}
         uses: ncipollo/release-action@v1
         with:
           tag: "v${{ steps.version.outputs.VERSION }}"
