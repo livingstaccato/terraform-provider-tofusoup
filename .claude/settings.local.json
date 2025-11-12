@@ -70,7 +70,8 @@
       "Bash(.github/scripts/single-test-verification.sh:*)",
       "Bash(.github/scripts/run-conformance-suite.sh:*)",
       "Bash(git check-ignore:*)",
-      "Bash(for dir in examples/data-sources/tofusoup_state_*/)"
+      "Bash(for dir in examples/data-sources/tofusoup_state_*/)",
+      "Bash(gh workflow run:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
