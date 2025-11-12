@@ -63,7 +63,8 @@
       "Bash(env)",
       "Bash(soup stir:*)",
       "Bash(TF_LOG=debug PYVIDER_LOG_LEVEL=debug soup stir:*)",
-      "Bash(export TF_LOG=debug PYVIDER_LOG_LEVEL=debug)"
+      "Bash(export TF_LOG=debug PYVIDER_LOG_LEVEL=debug)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nEnhance conformance test workflow with intelligent failure handling\n\nImprovements:\n- Add three-tier testing: smoke → single test → full suite\n- Single test verification acts as circuit breaker before full suite\n- Hybrid failure handling:\n  * Platform independence (fail-fast: false)\n  * Collect all failures in full suite (continue-on-error: true)\n  * Skip full suite if single test fails\n- Intelligent error reporting:\n  * Parse soup stir output for failure details\n  * Enhanced job summary with results table\n  * Better artifact collection (logs, state, crash files)\n- Debug logging enabled (TF_LOG=DEBUG, PYVIDER_LOG_LEVEL=debug)\n\nTechnical changes:\n- Refactored long inline scripts to .github/scripts/:\n  * single-test-verification.sh - Full lifecycle test on one example\n  * run-conformance-suite.sh - Full suite with parsing\n- Updated HANDOFF.md with detailed testing documentation\n\n🤖 Generated with Claude Code\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
