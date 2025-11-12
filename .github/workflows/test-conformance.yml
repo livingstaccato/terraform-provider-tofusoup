@@ -53,6 +53,7 @@ jobs:
     needs: check
     if: needs.check.outputs.should_run == 'true'
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: ubuntu-24.04
