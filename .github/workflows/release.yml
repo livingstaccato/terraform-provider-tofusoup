@@ -26,6 +26,7 @@ jobs:
   trigger_build:
     name: 🏗️ Trigger/Find Build
     runs-on: ubuntu-latest
+    if: inputs.build_run_id == ''
     permissions:
       actions: write
       contents: read
@@ -42,53 +43,44 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PROVIDED_ID="${inputs.build_run_id}"
+          # Try to find last successful build first
+          RUN_LIST=$(gh run list \
+            --workflow build-provider.yml \
+            --status completed \
+            --limit 1 \
+            --json databaseId,conclusion)
 
-          # If build_run_id was provided, use it directly
-          if [[ -n "$PROVIDED_ID" ]]; then
-            echo "✅ Using provided build_run_id: $PROVIDED_ID"
-            echo "run_id=$PROVIDED_ID" >> $GITHUB_OUTPUT
+          RUN_ID=$(echo "$RUN_LIST" | jq '.[] | select(.conclusion=="success") | .databaseId')
+
+          if [[ -n "$RUN_ID" ]] && [[ "$RUN_ID" != "null" ]]; then
+            echo "✅ Using last successful build: ${RUN_ID}"
+            echo "run_id=${RUN_ID}" >> $GITHUB_OUTPUT
             echo "use_existing=true" >> $GITHUB_OUTPUT
           else
-            # Try to find last successful build first
-            RUN_LIST=$(gh run list \
+            # No successful build found, trigger a new one
+            echo "⏳ No successful build found, triggering new build..."
+            gh workflow run build-provider.yml
+
+            # Wait a bit for the workflow to start
+            sleep 5
+
+            # Get the latest run
+            RUN_ID=$(gh run list \
               --workflow build-provider.yml \
-              --status completed \
               --limit 1 \
-              --json databaseId,conclusion)
+              --json databaseId \
+              --jq '.[0].databaseId')
 
-            RUN_ID=$(echo "$RUN_LIST" | jq '.[] | select(.conclusion=="success") | .databaseId')
-
-            if [[ -n "$RUN_ID" ]] && [[ "$RUN_ID" != "null" ]]; then
-              echo "✅ Using last successful build: $RUN_ID"
-              echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
-              echo "use_existing=true" >> $GITHUB_OUTPUT
-            else
-              # No successful build found, trigger a new one
-              echo "⏳ No successful build found, triggering new build..."
-              gh workflow run build-provider.yml
-
-              # Wait a bit for the workflow to start
-              sleep 5
-
-              # Get the latest run
-              RUN_ID=$(gh run list \
-                --workflow build-provider.yml \
-                --limit 1 \
-                --json databaseId \
-                --jq '.[0].databaseId')
-
-              echo "🚀 Build workflow triggered: $RUN_ID"
-              echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
-              echo "use_existing=false" >> $GITHUB_OUTPUT
-            fi
+            echo "🚀 Build workflow triggered: ${RUN_ID}"
+            echo "run_id=${RUN_ID}" >> $GITHUB_OUTPUT
+            echo "use_existing=false" >> $GITHUB_OUTPUT
           fi
 
   # Wait for build to complete
   wait_for_build:
     name: ⏳ Wait for Build
     needs: trigger_build
-    if: always() && needs.trigger_build.outputs.run_id != ''
+    if: always() && (inputs.build_run_id != '' || needs.trigger_build.outputs.run_id != '')
     runs-on: ubuntu-latest
     outputs:
       build_run_id: ${{ steps.wait.outputs.build_run_id }}
@@ -97,11 +89,12 @@ jobs:
       - name: ⏳ Wait for build completion
         id: wait
         run: |
-          RUN_ID="${{ needs.trigger_build.outputs.run_id }}"
+          # Handle both provided and auto-generated run IDs
+          RUN_ID="${{ inputs.build_run_id || needs.trigger_build.outputs.run_id }}"
           echo "build_run_id=${RUN_ID}" >> $GITHUB_OUTPUT
 
           # If using existing successful build, skip waiting
-          if [[ "${{ needs.trigger_build.outputs.use_existing }}" == "true" ]]; then
+          if [[ "${{ needs.trigger_build.outputs.use_existing }}" == "true" ]] || [[ -n "${{ inputs.build_run_id }}" ]]; then
             echo "✅ Using existing successful build: ${RUN_ID}"
             exit 0
           fi
