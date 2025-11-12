@@ -69,7 +69,8 @@
       "Bash(export TF_LOG=DEBUG PYVIDER_LOG_LEVEL=debug)",
       "Bash(.github/scripts/single-test-verification.sh:*)",
       "Bash(.github/scripts/run-conformance-suite.sh:*)",
-      "Bash(git check-ignore:*)"
+      "Bash(git check-ignore:*)",
+      "Bash(for dir in examples/data-sources/tofusoup_state_*/)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
