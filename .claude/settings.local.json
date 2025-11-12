@@ -52,7 +52,10 @@
       "Bash(terraform plan:*)",
       "Bash(make:*)",
       "Bash(. .venv/bin/activate)",
-      "Bash(mkdocs.yml)"
+      "Bash(mkdocs.yml)",
+      "Bash(chmod:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)"
     ],
     "additionalDirectories": [
       "/Users/tim/code/gh/provide-io",
