@@ -26,7 +26,6 @@ jobs:
   trigger_build:
     name: 🏗️ Trigger/Find Build
     runs-on: ubuntu-latest
-    if: inputs.build_run_id == ''
     permissions:
       actions: write
       contents: read
@@ -43,6 +42,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # If build_run_id was provided, use it directly
+          if [[ -n "${{ inputs.build_run_id }}" ]]; then
+            RUN_ID="${{ inputs.build_run_id }}"
+            echo "✅ Using provided build_run_id: ${RUN_ID}"
+            echo "run_id=${RUN_ID}" >> $GITHUB_OUTPUT
+            echo "use_existing=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           # Try to find last successful build first
           RUN_LIST=$(gh run list \
             --workflow build-provider.yml \
@@ -80,7 +88,7 @@ jobs:
   wait_for_build:
     name: ⏳ Wait for Build
     needs: trigger_build
-    if: always() && (inputs.build_run_id != '' || needs.trigger_build.outputs.run_id != '')
+    if: always() && needs.trigger_build.outputs.run_id != ''
     runs-on: ubuntu-latest
     outputs:
       build_run_id: ${{ steps.wait.outputs.build_run_id }}
@@ -89,15 +97,10 @@ jobs:
       - name: ⏳ Wait for build completion
         id: wait
         run: |
-          RUN_ID="${{ inputs.build_run_id }}" || RUN_ID="${{ needs.trigger_build.outputs.run_id }}"
+          RUN_ID="${{ needs.trigger_build.outputs.run_id }}"
           echo "build_run_id=${RUN_ID}" >> $GITHUB_OUTPUT
 
-          # If provided or using existing successful build, skip waiting
-          if [[ -n "${{ inputs.build_run_id }}" ]]; then
-            echo "✅ Using provided build_run_id: ${RUN_ID}"
-            exit 0
-          fi
-
+          # If using existing successful build, skip waiting
           if [[ "${{ needs.trigger_build.outputs.use_existing }}" == "true" ]]; then
             echo "✅ Using existing successful build: ${RUN_ID}"
             exit 0
