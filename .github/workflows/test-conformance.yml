@@ -59,8 +59,8 @@ jobs:
                 --status completed \
                 --conclusion success \
                 --limit 1 \
-                --json id \
-                --jq '.[0].id' 2>/dev/null || echo "")
+                --json databaseId \
+                --jq '.[0].databaseId' 2>/dev/null || echo "")
 
               if [[ -n "$BUILD_RUN_ID" ]]; then
                 echo "✅ Using last successful build run: ${BUILD_RUN_ID}"

@@ -44,8 +44,8 @@ jobs:
             --status completed \
             --conclusion success \
             --limit 1 \
-            --json id \
-            --jq '.[0].id' 2>/dev/null || echo "")
+            --json databaseId \
+            --jq '.[0].databaseId' 2>/dev/null || echo "")
 
           if [[ -n "$RUN_ID" ]]; then
             echo "✅ Using last successful build: ${RUN_ID}"
@@ -63,8 +63,8 @@ jobs:
             RUN_ID=$(gh run list \
               --workflow build-provider.yml \
               --limit 1 \
-              --json id \
-              --jq '.[0].id')
+              --json databaseId \
+              --jq '.[0].databaseId')
 
             echo "🚀 Build workflow triggered: ${RUN_ID}"
             echo "run_id=${RUN_ID}" >> $GITHUB_OUTPUT
