@@ -42,7 +42,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PROVIDED_ID="${{ inputs.build_run_id }}"
+          PROVIDED_ID="${inputs.build_run_id}"
 
           # If build_run_id was provided, use it directly
           if [[ -n "$PROVIDED_ID" ]]; then
